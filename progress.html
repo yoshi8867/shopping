@@ -1,0 +1,466 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Mall — 진행 상황</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --accent: #6c8aff;
+      --accent2: #a78bfa;
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --orange: #fb923c;
+      --cyan: #22d3ee;
+      --text: #e2e8f0;
+      --muted: #8892b0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+      min-height: 100vh;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #151929 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 1.8rem 3rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    header h1 { font-size: 1.6rem; font-weight: 700; color: var(--accent); }
+    header p { color: var(--muted); margin-top: 0.2rem; font-size: 0.9rem; }
+    .last-updated {
+      font-size: 0.78rem; color: var(--muted);
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 6px; padding: 0.4rem 0.8rem;
+    }
+
+    main { padding: 2rem 3rem; max-width: 1300px; }
+
+    /* ── 전체 진행률 ── */
+    .overall-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.6rem 2rem;
+      margin-bottom: 2rem;
+      display: grid;
+      grid-template-columns: 1fr auto;
+      gap: 1.5rem;
+      align-items: center;
+    }
+    .overall-title { font-size: 0.8rem; color: var(--muted); font-weight: 600; letter-spacing: 0.08em; text-transform: uppercase; margin-bottom: 0.6rem; }
+    .overall-pct { font-size: 2.8rem; font-weight: 800; color: var(--accent); line-height: 1; }
+    .overall-sub { font-size: 0.85rem; color: var(--muted); margin-top: 0.3rem; }
+    .progress-bar-wrap { margin-top: 1rem; }
+    .progress-bar-bg {
+      background: var(--surface2); border-radius: 99px; height: 10px; overflow: hidden;
+    }
+    .progress-bar-fill {
+      height: 100%; border-radius: 99px;
+      background: linear-gradient(90deg, var(--accent) 0%, var(--accent2) 100%);
+      transition: width 0.6s ease;
+    }
+    .stat-grid { display: flex; gap: 1.2rem; }
+    .stat-item {
+      background: var(--surface2); border: 1px solid var(--border);
+      border-radius: 10px; padding: 0.8rem 1.2rem; text-align: center; min-width: 90px;
+    }
+    .stat-num { font-size: 1.6rem; font-weight: 800; }
+    .stat-label { font-size: 0.72rem; color: var(--muted); margin-top: 0.1rem; }
+
+    /* ── 섹션 제목 ── */
+    .section-title {
+      font-size: 1rem; font-weight: 600; color: var(--accent2);
+      margin: 2rem 0 1rem;
+      display: flex; align-items: center; gap: 0.5rem;
+    }
+    .section-title::before {
+      content: ''; display: block; width: 4px; height: 1rem;
+      background: var(--accent2); border-radius: 2px;
+    }
+
+    /* ── Phase 카드 그리드 ── */
+    .phases-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(360px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2rem;
+    }
+    .phase-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .phase-card.done { border-color: rgba(52,211,153,0.35); }
+    .phase-card.wip  { border-color: rgba(251,191,36,0.35); }
+    .phase-card.todo { border-color: var(--border); opacity: 0.7; }
+
+    .phase-header {
+      padding: 0.9rem 1.2rem;
+      display: flex; align-items: center; gap: 0.7rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .phase-num {
+      width: 26px; height: 26px; border-radius: 50%;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.75rem; font-weight: 800; flex-shrink: 0;
+    }
+    .done .phase-num { background: rgba(52,211,153,0.2); color: var(--green); }
+    .wip  .phase-num { background: rgba(251,191,36,0.2); color: var(--yellow); }
+    .todo .phase-num { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+    .phase-name { font-size: 0.95rem; font-weight: 700; }
+    .done .phase-name { color: var(--green); }
+    .wip  .phase-name { color: var(--yellow); }
+    .todo .phase-name { color: var(--muted); }
+
+    .phase-badge {
+      margin-left: auto; font-size: 0.7rem; font-weight: 700;
+      padding: 0.2rem 0.6rem; border-radius: 99px;
+    }
+    .done .phase-badge { background: rgba(52,211,153,0.15); color: var(--green); }
+    .wip  .phase-badge { background: rgba(251,191,36,0.15); color: var(--yellow); }
+    .todo .phase-badge { background: rgba(255,255,255,0.06); color: var(--muted); }
+
+    .phase-body { padding: 0.9rem 1.2rem; }
+    .phase-mini-bar {
+      height: 4px; background: var(--surface2); border-radius: 99px;
+      overflow: hidden; margin-bottom: 0.9rem;
+    }
+    .phase-mini-bar-fill {
+      height: 100%; border-radius: 99px; transition: width 0.5s ease;
+    }
+    .done .phase-mini-bar-fill { background: var(--green); }
+    .wip  .phase-mini-bar-fill { background: var(--yellow); }
+    .todo .phase-mini-bar-fill { background: var(--muted); }
+
+    /* ── 체크리스트 ── */
+    .checklist { display: flex; flex-direction: column; gap: 0.4rem; }
+    .check-item {
+      display: flex; align-items: flex-start; gap: 0.55rem;
+      font-size: 0.83rem; line-height: 1.5;
+    }
+    .check-icon { flex-shrink: 0; margin-top: 0.05rem; font-size: 0.85rem; }
+    .check-text.done-text { color: var(--text); }
+    .check-text.todo-text { color: var(--muted); }
+    .check-sub {
+      font-size: 0.75rem; color: var(--muted); margin-left: 1.45rem; margin-top: 0.1rem;
+    }
+
+    /* ── 타임라인 ── */
+    .timeline { position: relative; padding-left: 1.8rem; }
+    .timeline::before {
+      content: ''; position: absolute; left: 7px; top: 0; bottom: 0;
+      width: 2px; background: var(--border);
+    }
+    .tl-item { position: relative; margin-bottom: 1.2rem; }
+    .tl-dot {
+      position: absolute; left: -1.8rem; top: 0.3rem;
+      width: 14px; height: 14px; border-radius: 50%;
+      border: 2px solid var(--border); background: var(--bg);
+      display: flex; align-items: center; justify-content: center;
+    }
+    .tl-dot.done { border-color: var(--green); background: rgba(52,211,153,0.2); }
+    .tl-dot.wip  { border-color: var(--yellow); background: rgba(251,191,36,0.2); }
+    .tl-date { font-size: 0.72rem; color: var(--muted); font-family: monospace; }
+    .tl-title { font-size: 0.88rem; font-weight: 600; margin-top: 0.1rem; }
+    .tl-desc { font-size: 0.8rem; color: var(--muted); margin-top: 0.2rem; }
+    .tl-tags { display: flex; flex-wrap: wrap; gap: 0.3rem; margin-top: 0.4rem; }
+    .tl-tag {
+      font-size: 0.68rem; padding: 0.1rem 0.45rem; border-radius: 99px;
+      background: rgba(108,138,255,0.12); color: var(--accent); font-weight: 500;
+    }
+    .tl-tag.green { background: rgba(52,211,153,0.12); color: var(--green); }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Shopping Mall — 진행 상황</h1>
+    <p>NestJS + React 쇼핑몰 연습 프로젝트</p>
+  </div>
+  <div class="last-updated">마지막 업데이트: 2026-03-25</div>
+</header>
+
+<main>
+
+  <!-- ── 전체 진행률 ── -->
+  <div class="overall-card">
+    <div>
+      <div class="overall-title">전체 진행률</div>
+      <div class="overall-pct">22%</div>
+      <div class="overall-sub">9단계 중 2단계 완료 · 백엔드 진행 중</div>
+      <div class="progress-bar-wrap">
+        <div class="progress-bar-bg">
+          <div class="progress-bar-fill" style="width:22%;"></div>
+        </div>
+      </div>
+    </div>
+    <div class="stat-grid">
+      <div class="stat-item">
+        <div class="stat-num" style="color:var(--green);">2</div>
+        <div class="stat-label">완료</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" style="color:var(--yellow);">1</div>
+        <div class="stat-label">진행 중</div>
+      </div>
+      <div class="stat-item">
+        <div class="stat-num" style="color:var(--muted);">6</div>
+        <div class="stat-label">대기</div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Phase 카드 ── -->
+  <div class="section-title">단계별 진행 현황</div>
+  <div class="phases-grid">
+
+    <!-- 1. 프로젝트 초기화 -->
+    <div class="phase-card done">
+      <div class="phase-header">
+        <div class="phase-num">1</div>
+        <div class="phase-name">프로젝트 초기화</div>
+        <div class="phase-badge">완료</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:100%;"></div></div>
+        <div class="checklist">
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">NestJS CLI 설치 및 프로젝트 스캐폴딩</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">TypeORM + better-sqlite3 연결</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">JWT, Passport, bcrypt, Swagger 설치</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">ValidationPipe (전역 DTO 검증)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">CORS 설정 (localhost:5173 허용)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">Swagger UI (/api/docs)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">.env 환경변수 구성</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 2. AuthModule -->
+    <div class="phase-card done">
+      <div class="phase-header">
+        <div class="phase-num">2</div>
+        <div class="phase-name">AuthModule</div>
+        <div class="phase-badge">완료</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:100%;"></div></div>
+        <div class="checklist">
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">User 엔티티 (role: USER/ADMIN)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">POST /api/auth/register — 회원가입</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">POST /api/auth/login — JWT 발급</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">GET /api/auth/me — 내 정보</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">JwtAuthGuard / RolesGuard</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">@CurrentUser / @Roles 데코레이터</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">유닛 테스트 6개 (Jest) — 전체 통과</span></div>
+          <div class="check-sub">register: 정상가입 / 이메일중복 / bcrypt 해시 확인</div>
+          <div class="check-sub">login: 정상로그인 / 없는이메일 / 틀린비밀번호</div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 3. UserModule -->
+    <div class="phase-card todo">
+      <div class="phase-header">
+        <div class="phase-num">3</div>
+        <div class="phase-name">UserModule</div>
+        <div class="phase-badge">대기</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="checklist">
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/users/me — 내 프로필 상세</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">PATCH /api/users/me — 내 정보 수정</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/admin/users — 전체 회원 목록 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 4. CategoryModule -->
+    <div class="phase-card todo">
+      <div class="phase-header">
+        <div class="phase-num">4</div>
+        <div class="phase-name">CategoryModule</div>
+        <div class="phase-badge">대기</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="checklist">
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Category 엔티티</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/categories — 목록 (공개)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/categories — 생성 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">PATCH /api/categories/:id — 수정 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">DELETE /api/categories/:id — 삭제 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 5. ProductModule -->
+    <div class="phase-card todo">
+      <div class="phase-header">
+        <div class="phase-num">5</div>
+        <div class="phase-name">ProductModule</div>
+        <div class="phase-badge">대기</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="checklist">
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Product 엔티티</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/products — 목록 (필터·정렬)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/products/:id — 상세</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/products — 등록 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">PATCH /api/products/:id — 수정 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">DELETE /api/products/:id — 삭제 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 6. CartModule -->
+    <div class="phase-card todo">
+      <div class="phase-header">
+        <div class="phase-num">6</div>
+        <div class="phase-name">CartModule</div>
+        <div class="phase-badge">대기</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="checklist">
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Cart / CartItem 엔티티</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/cart — 내 장바구니</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/cart/items — 상품 추가</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">PATCH /api/cart/items/:id — 수량 수정</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">DELETE /api/cart/items/:id — 항목 삭제</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 7. OrderModule -->
+    <div class="phase-card todo">
+      <div class="phase-header">
+        <div class="phase-num">7</div>
+        <div class="phase-name">OrderModule</div>
+        <div class="phase-badge">대기</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="checklist">
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Order / OrderItem 엔티티</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/orders — 주문 생성</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/orders — 내 주문 목록</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/orders/:id — 주문 상세</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">DELETE /api/orders/:id — 주문 취소</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/admin/orders — 전체 주문 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">PATCH /api/admin/orders/:id/status — 상태 변경</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 8. PaymentModule -->
+    <div class="phase-card todo">
+      <div class="phase-header">
+        <div class="phase-num">8</div>
+        <div class="phase-name">PaymentModule (Mock)</div>
+        <div class="phase-badge">대기</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="checklist">
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Payment 엔티티</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/payments — 결제 요청</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/payments/callback — Mock PG 콜백</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/payments/:orderId — 결제 상태</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/payments/:id/refund — 환불</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+        </div>
+      </div>
+    </div>
+
+    <!-- 9. Frontend -->
+    <div class="phase-card todo">
+      <div class="phase-header">
+        <div class="phase-num">9</div>
+        <div class="phase-name">Frontend (React + Vite)</div>
+        <div class="phase-badge">대기</div>
+      </div>
+      <div class="phase-body">
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="checklist">
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Vite + React + TypeScript 초기화</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Tailwind CSS + Zustand + Axios 설치</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">공개 페이지 (상품 목록 / 상세)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">인증 페이지 (로그인 / 회원가입)</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">장바구니 / 주문 페이지</span></div>
+          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">관리자 페이지 (주문·상품·카테고리)</span></div>
+        </div>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 작업 이력 타임라인 ── -->
+  <div class="section-title">작업 이력</div>
+  <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-dot done"></div>
+      <div class="tl-date">2026-03-25</div>
+      <div class="tl-title" style="color:var(--green);">AuthModule 완료</div>
+      <div class="tl-desc">회원가입·로그인·JWT·Guard·Decorator 구현. 유닛 테스트 6개 전체 통과.</div>
+      <div class="tl-tags">
+        <span class="tl-tag green">register</span>
+        <span class="tl-tag green">login</span>
+        <span class="tl-tag green">JWT</span>
+        <span class="tl-tag green">RolesGuard</span>
+        <span class="tl-tag green">Jest 6/6</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot done"></div>
+      <div class="tl-date">2026-03-25</div>
+      <div class="tl-title" style="color:var(--green);">프로젝트 초기화 완료</div>
+      <div class="tl-desc">NestJS 스캐폴딩, TypeORM + SQLite 연결, Swagger UI, ValidationPipe, CORS, .env 설정.</div>
+      <div class="tl-tags">
+        <span class="tl-tag green">NestJS</span>
+        <span class="tl-tag green">TypeORM</span>
+        <span class="tl-tag green">SQLite</span>
+        <span class="tl-tag green">Swagger</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot done"></div>
+      <div class="tl-date">2026-03-25</div>
+      <div class="tl-title" style="color:var(--green);">DB 설계 확정</div>
+      <div class="tl-desc">8개 엔티티(User, Category, Product, Cart, CartItem, Order, OrderItem, Payment) ER 다이어그램 및 CREATE 문 작성.</div>
+      <div class="tl-tags">
+        <span class="tl-tag green">8 entities</span>
+        <span class="tl-tag green">ER Diagram</span>
+        <span class="tl-tag green">CREATE SQL</span>
+      </div>
+    </div>
+
+  </div>
+
+</main>
+
+</body>
+</html>

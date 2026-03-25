@@ -1,0 +1,692 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Mall — 기술 스택</title>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --accent: #6c8aff;
+      --accent2: #a78bfa;
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --orange: #fb923c;
+      --cyan: #22d3ee;
+      --text: #e2e8f0;
+      --muted: #8892b0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #151929 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 3rem;
+      display: flex;
+      align-items: center;
+      gap: 1.5rem;
+    }
+    header h1 { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+    header p { color: var(--muted); margin-top: 0.3rem; font-size: 0.95rem; }
+
+    nav {
+      display: flex;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 3rem;
+    }
+    nav button {
+      background: none; border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--muted); cursor: pointer;
+      font-size: 0.9rem; padding: 1rem 1.4rem;
+      transition: all 0.2s;
+    }
+    nav button:hover { color: var(--text); }
+    nav button.active { color: var(--accent); border-bottom-color: var(--accent); }
+
+    main { padding: 2.5rem 3rem; max-width: 1400px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    .section-title {
+      font-size: 1.1rem; font-weight: 600; color: var(--accent2);
+      margin-bottom: 1.4rem; display: flex; align-items: center; gap: 0.5rem;
+    }
+    .section-title::before {
+      content: ''; display: block; width: 4px; height: 1.1rem;
+      background: var(--accent2); border-radius: 2px;
+    }
+
+    /* ── Overview architecture ── */
+    .arch-wrap {
+      display: grid;
+      grid-template-columns: 1fr 60px 1fr 60px 1fr;
+      gap: 0;
+      align-items: center;
+      margin-bottom: 2.5rem;
+    }
+    .arch-box {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 14px;
+      padding: 1.4rem;
+      text-align: center;
+    }
+    .arch-box .layer-label {
+      font-size: 0.72rem; letter-spacing: 0.1em; font-weight: 700;
+      text-transform: uppercase; margin-bottom: 0.8rem;
+    }
+    .arch-box .layer-name {
+      font-size: 1.3rem; font-weight: 700; margin-bottom: 0.3rem;
+    }
+    .arch-box .layer-sub { font-size: 0.82rem; color: var(--muted); }
+    .arch-arrow {
+      text-align: center; font-size: 1.6rem; color: var(--border);
+    }
+
+    /* ── Stack cards grid ── */
+    .stack-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(300px, 1fr));
+      gap: 1.2rem;
+      margin-bottom: 2.5rem;
+    }
+    .stack-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+      transition: border-color 0.2s;
+    }
+    .stack-card:hover { border-color: var(--accent); }
+    .stack-card-header {
+      padding: 1rem 1.2rem;
+      display: flex; align-items: center; gap: 0.8rem;
+      border-bottom: 1px solid var(--border);
+    }
+    .stack-icon {
+      width: 36px; height: 36px; border-radius: 8px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 1.1rem; flex-shrink: 0;
+    }
+    .stack-card-header h3 { font-size: 1rem; font-weight: 700; }
+    .stack-card-header .ver {
+      margin-left: auto; font-size: 0.72rem; color: var(--muted);
+      font-family: monospace;
+    }
+    .stack-body { padding: 0.9rem 1.2rem; }
+    .stack-role {
+      font-size: 0.78rem; color: var(--muted); margin-bottom: 0.6rem;
+    }
+    .stack-desc { font-size: 0.85rem; color: var(--text); line-height: 1.7; }
+    .stack-tags { display: flex; flex-wrap: wrap; gap: 0.4rem; margin-top: 0.8rem; }
+    .stag {
+      font-size: 0.72rem; padding: 0.15rem 0.55rem;
+      border-radius: 99px; font-weight: 500;
+      background: rgba(108,138,255,0.12); color: var(--accent);
+    }
+
+    /* ── Flow diagram ── */
+    .flow-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      margin-bottom: 2.5rem;
+    }
+    .flow {
+      display: flex; align-items: center; gap: 0; flex-wrap: wrap;
+    }
+    .flow-node {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      border-radius: 8px;
+      padding: 0.6rem 1rem;
+      font-size: 0.82rem; font-family: monospace;
+      text-align: center; min-width: 110px;
+    }
+    .flow-node .fn-label { font-size: 0.68rem; color: var(--muted); margin-bottom: 2px; }
+    .flow-node .fn-name { font-weight: 700; }
+    .flow-arrow { padding: 0 0.6rem; color: var(--muted); font-size: 1.2rem; }
+    .flow-note {
+      font-size: 0.78rem; color: var(--muted); margin-top: 1rem; line-height: 1.7;
+    }
+
+    /* ── API flow ── */
+    .api-flow {
+      display: flex; flex-direction: column; gap: 0.5rem;
+    }
+    .api-row {
+      display: flex; align-items: center; gap: 0.8rem;
+      background: var(--surface2); border-radius: 8px;
+      padding: 0.6rem 1rem; font-size: 0.83rem;
+    }
+    .api-layer {
+      font-size: 0.7rem; font-weight: 700; letter-spacing: 0.05em;
+      padding: 0.2rem 0.6rem; border-radius: 4px; min-width: 90px; text-align: center;
+    }
+    .api-desc { color: var(--muted); font-size: 0.8rem; }
+
+    /* ── Dependencies ── */
+    .dep-table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    .dep-table th {
+      background: rgba(108,138,255,0.08); color: var(--muted);
+      font-size: 0.75rem; letter-spacing: 0.05em; text-align: left;
+      padding: 0.6rem 1rem; font-weight: 600;
+    }
+    .dep-table td { padding: 0.55rem 1rem; border-top: 1px solid var(--border); }
+    .dep-table tr:hover td { background: rgba(255,255,255,0.02); }
+    .pkg { font-family: monospace; color: var(--green); }
+    .pkg-ver { font-family: monospace; color: var(--muted); font-size: 0.8rem; }
+    .dep-wrap {
+      background: var(--surface); border: 1px solid var(--border);
+      border-radius: 12px; overflow: hidden;
+    }
+    .dep-section-label {
+      background: var(--surface2); padding: 0.5rem 1rem;
+      font-size: 0.75rem; color: var(--muted); letter-spacing: 0.08em;
+      font-weight: 700; text-transform: uppercase;
+      border-top: 1px solid var(--border);
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <div>
+    <h1>Shopping Mall — 기술 스택</h1>
+    <p>NestJS + React 쇼핑몰 연습 프로젝트 · 2026</p>
+  </div>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('overview')">아키텍처 개요</button>
+  <button onclick="showTab('backend')">백엔드 스택</button>
+  <button onclick="showTab('frontend')">프론트엔드 스택</button>
+  <button onclick="showTab('flow')">요청 흐름</button>
+  <button onclick="showTab('deps')">패키지 목록</button>
+</nav>
+
+<main>
+
+  <!-- ── Overview ── -->
+  <div id="overview" class="tab-content active">
+    <div class="section-title">전체 아키텍처</div>
+
+    <div class="arch-wrap">
+      <div class="arch-box" style="border-color:rgba(34,211,238,0.4);">
+        <div class="layer-label" style="color:var(--cyan);">Client</div>
+        <div class="layer-name" style="color:var(--cyan);">React</div>
+        <div class="layer-sub">Vite + TypeScript<br/>Tailwind CSS<br/>Zustand · React Router</div>
+      </div>
+      <div class="arch-arrow">⟶</div>
+      <div class="arch-box" style="border-color:rgba(108,138,255,0.4);">
+        <div class="layer-label" style="color:var(--accent);">Server</div>
+        <div class="layer-name" style="color:var(--accent);">NestJS</div>
+        <div class="layer-sub">REST API · JWT Auth<br/>TypeORM · Swagger<br/>class-validator</div>
+      </div>
+      <div class="arch-arrow">⟶</div>
+      <div class="arch-box" style="border-color:rgba(52,211,153,0.4);">
+        <div class="layer-label" style="color:var(--green);">Database</div>
+        <div class="layer-name" style="color:var(--green);">SQLite</div>
+        <div class="layer-sub">better-sqlite3<br/>파일 기반 · 설치 불필요<br/>개발/연습용</div>
+      </div>
+    </div>
+
+    <div class="section-title">포트 구성</div>
+    <div class="stack-grid" style="grid-template-columns: repeat(3, 1fr);">
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(34,211,238,0.15);color:var(--cyan);">🖥️</div>
+          <h3>Frontend</h3>
+          <span class="ver">:5173</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-desc">Vite dev server<br/><code style="color:var(--cyan);">http://localhost:5173</code></div>
+        </div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(108,138,255,0.15);color:var(--accent);">⚙️</div>
+          <h3>Backend API</h3>
+          <span class="ver">:3000</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-desc">NestJS REST API<br/><code style="color:var(--accent);">http://localhost:3000/api</code></div>
+        </div>
+      </div>
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(251,191,36,0.15);color:var(--yellow);">📄</div>
+          <h3>Swagger Docs</h3>
+          <span class="ver">:3000</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-desc">API 문서 자동 생성<br/><code style="color:var(--yellow);">http://localhost:3000/api/docs</code></div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Backend ── -->
+  <div id="backend" class="tab-content">
+    <div class="section-title">백엔드 기술 스택</div>
+    <div class="stack-grid">
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(231,76,60,0.15);color:#e74c3c;">🔴</div>
+          <h3>NestJS</h3>
+          <span class="ver">v11</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">메인 프레임워크</div>
+          <div class="stack-desc">Node.js 위에서 동작하는 TypeScript 기반 서버 프레임워크. 모듈/컨트롤러/서비스 구조로 관심사 분리.</div>
+          <div class="stack-tags">
+            <span class="stag">TypeScript</span>
+            <span class="stag">DI</span>
+            <span class="stag">Decorator</span>
+            <span class="stag">Module</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">🗄️</div>
+          <h3>TypeORM</h3>
+          <span class="ver">v0.3</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">ORM (Object Relational Mapper)</div>
+          <div class="stack-desc">엔티티 클래스로 DB 테이블 정의. TypeScript 데코레이터로 관계·제약 선언. <code>synchronize: true</code>로 개발 중 자동 스키마 생성.</div>
+          <div class="stack-tags">
+            <span class="stag">Entity</span>
+            <span class="stag">Repository</span>
+            <span class="stag">Relations</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">🟢</div>
+          <h3>SQLite (better-sqlite3)</h3>
+          <span class="ver">파일 DB</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">데이터베이스</div>
+          <div class="stack-desc">별도 DB 서버 설치 없이 <code>.sqlite</code> 파일 하나로 동작. 연습 프로젝트에 최적. 실제 배포 시 PostgreSQL로 교체 가능.</div>
+          <div class="stack-tags">
+            <span class="stag">파일 기반</span>
+            <span class="stag">Zero Config</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(251,191,36,0.15);color:var(--yellow);">🔑</div>
+          <h3>JWT + Passport</h3>
+          <span class="ver">@nestjs/jwt</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">인증 · 인가</div>
+          <div class="stack-desc">로그인 시 JWT 발급, 이후 요청마다 Bearer 토큰으로 인증. <code>JwtAuthGuard</code>와 <code>RolesGuard</code>로 엔드포인트별 접근 제어.</div>
+          <div class="stack-tags">
+            <span class="stag">JWT</span>
+            <span class="stag">Bearer Token</span>
+            <span class="stag">Role Guard</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(248,113,113,0.15);color:var(--red);">🔒</div>
+          <h3>bcryptjs</h3>
+          <span class="ver">v2</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">비밀번호 해싱</div>
+          <div class="stack-desc">회원가입 시 비밀번호를 bcrypt salt=10으로 해시하여 저장. 평문 비밀번호는 DB에 절대 저장하지 않음.</div>
+          <div class="stack-tags">
+            <span class="stag">Hash</span>
+            <span class="stag">Salt</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(108,138,255,0.15);color:var(--accent);">📋</div>
+          <h3>Swagger (OpenAPI)</h3>
+          <span class="ver">@nestjs/swagger</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">API 문서 자동 생성</div>
+          <div class="stack-desc">컨트롤러·DTO 데코레이터에서 자동으로 API 문서 생성. <code>/api/docs</code>에서 브라우저로 API 직접 테스트 가능.</div>
+          <div class="stack-tags">
+            <span class="stag">OpenAPI 3.0</span>
+            <span class="stag">Swagger UI</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(167,139,250,0.15);color:var(--accent2);">✅</div>
+          <h3>class-validator</h3>
+          <span class="ver">+ class-transformer</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">DTO 입력값 검증</div>
+          <div class="stack-desc">DTO 클래스에 <code>@IsEmail()</code>, <code>@MinLength()</code> 등의 데코레이터로 요청 바디 자동 검증. 잘못된 입력은 400으로 자동 거절.</div>
+          <div class="stack-tags">
+            <span class="stag">Validation</span>
+            <span class="stag">Transform</span>
+            <span class="stag">DTO</span>
+          </div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">🧪</div>
+          <h3>Jest</h3>
+          <span class="ver">내장</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">유닛 테스트</div>
+          <div class="stack-desc">NestJS 기본 내장 테스트 프레임워크. Repository·Service를 Mock으로 교체해 비즈니스 로직만 격리 테스트. <code>npm run test</code>로 실행.</div>
+          <div class="stack-tags">
+            <span class="stag">Unit Test</span>
+            <span class="stag">Mock</span>
+            <span class="stag">Describe/It</span>
+          </div>
+        </div>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- ── Frontend ── -->
+  <div id="frontend" class="tab-content">
+    <div class="section-title">프론트엔드 기술 스택 (예정)</div>
+    <div class="stack-grid">
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(34,211,238,0.15);color:var(--cyan);">⚛️</div>
+          <h3>React</h3>
+          <span class="ver">v19</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">UI 라이브러리</div>
+          <div class="stack-desc">컴포넌트 기반 UI 구성. 함수형 컴포넌트 + Hooks 방식 사용.</div>
+          <div class="stack-tags"><span class="stag">JSX</span><span class="stag">Hooks</span><span class="stag">Component</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(251,191,36,0.15);color:var(--yellow);">⚡</div>
+          <h3>Vite</h3>
+          <span class="ver">v6</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">빌드 도구 · Dev Server</div>
+          <div class="stack-desc">ES 모듈 기반의 초고속 번들러. 개발 서버 HMR(Hot Module Replacement) 지원.</div>
+          <div class="stack-tags"><span class="stag">HMR</span><span class="stag">ESM</span><span class="stag">빠른 빌드</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(108,138,255,0.15);color:var(--accent);">🔷</div>
+          <h3>TypeScript</h3>
+          <span class="ver">v5</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">타입 안전성</div>
+          <div class="stack-desc">백엔드 DTO와 타입을 공유해 API 응답 타입을 안전하게 사용. 런타임 에러 사전 방지.</div>
+          <div class="stack-tags"><span class="stag">Type Safe</span><span class="stag">Interface</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(34,211,238,0.15);color:var(--cyan);">🎨</div>
+          <h3>Tailwind CSS</h3>
+          <span class="ver">v4</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">스타일링</div>
+          <div class="stack-desc">유틸리티 클래스 기반 CSS 프레임워크. 별도 CSS 파일 없이 빠른 스타일 적용.</div>
+          <div class="stack-tags"><span class="stag">Utility-First</span><span class="stag">Responsive</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(167,139,250,0.15);color:var(--accent2);">🐻</div>
+          <h3>Zustand</h3>
+          <span class="ver">v5</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">전역 상태 관리</div>
+          <div class="stack-desc">Redux보다 훨씬 가벼운 상태 관리 라이브러리. 로그인 상태·장바구니 정보 전역 관리.</div>
+          <div class="stack-tags"><span class="stag">Store</span><span class="stag">경량</span><span class="stag">Hooks API</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(248,113,113,0.15);color:var(--red);">🗺️</div>
+          <h3>React Router</h3>
+          <span class="ver">v7</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">클라이언트 사이드 라우팅</div>
+          <div class="stack-desc">SPA에서 URL 기반 페이지 전환. 인증 여부에 따른 Protected Route 구현.</div>
+          <div class="stack-tags"><span class="stag">SPA</span><span class="stag">Protected Route</span></div>
+        </div>
+      </div>
+
+      <div class="stack-card">
+        <div class="stack-card-header">
+          <div class="stack-icon" style="background:rgba(52,211,153,0.15);color:var(--green);">🌐</div>
+          <h3>Axios</h3>
+          <span class="ver">v1</span>
+        </div>
+        <div class="stack-body">
+          <div class="stack-role">HTTP 클라이언트</div>
+          <div class="stack-desc">백엔드 API 호출. 인터셉터로 JWT 토큰 자동 첨부 및 401 응답 시 로그아웃 처리.</div>
+          <div class="stack-tags"><span class="stag">Interceptor</span><span class="stag">REST</span></div>
+        </div>
+      </div>
+
+    </div>
+
+    <div class="section-title">예정 페이지 구성</div>
+    <div class="stack-grid">
+      <div class="stack-card" style="border-left:3px solid var(--cyan);">
+        <div class="stack-body">
+          <div class="stack-role">공개 페이지</div>
+          <div class="stack-desc" style="line-height:2;">
+            / — 메인 (상품 목록)<br/>
+            /products/:id — 상품 상세<br/>
+            /login — 로그인<br/>
+            /register — 회원가입
+          </div>
+        </div>
+      </div>
+      <div class="stack-card" style="border-left:3px solid var(--accent);">
+        <div class="stack-body">
+          <div class="stack-role">로그인 필요</div>
+          <div class="stack-desc" style="line-height:2;">
+            /cart — 장바구니<br/>
+            /orders — 내 주문 목록<br/>
+            /orders/:id — 주문 상세<br/>
+            /profile — 내 정보
+          </div>
+        </div>
+      </div>
+      <div class="stack-card" style="border-left:3px solid var(--yellow);">
+        <div class="stack-body">
+          <div class="stack-role">관리자 전용</div>
+          <div class="stack-desc" style="line-height:2;">
+            /admin/orders — 전체 주문 관리<br/>
+            /admin/products — 상품 관리<br/>
+            /admin/categories — 카테고리 관리<br/>
+            /admin/users — 회원 관리
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Flow ── -->
+  <div id="flow" class="tab-content">
+    <div class="section-title">JWT 인증 흐름</div>
+    <div class="flow-wrap">
+      <div class="flow">
+        <div class="flow-node">
+          <div class="fn-label">Client</div>
+          <div class="fn-name" style="color:var(--cyan);">React</div>
+        </div>
+        <div class="flow-arrow">──POST /login──▶</div>
+        <div class="flow-node">
+          <div class="fn-label">Controller</div>
+          <div class="fn-name" style="color:var(--accent);">AuthController</div>
+        </div>
+        <div class="flow-arrow">▶</div>
+        <div class="flow-node">
+          <div class="fn-label">Service</div>
+          <div class="fn-name" style="color:var(--accent);">AuthService</div>
+        </div>
+        <div class="flow-arrow">▶ bcrypt.compare ▶</div>
+        <div class="flow-node">
+          <div class="fn-label">Response</div>
+          <div class="fn-name" style="color:var(--green);">accessToken</div>
+        </div>
+      </div>
+      <div class="flow-note">
+        ① 로그인 성공 → JWT 발급 → 클라이언트 저장 (localStorage 또는 메모리)<br/>
+        ② 이후 모든 인증 필요 요청: <code>Authorization: Bearer &lt;token&gt;</code> 헤더 첨부<br/>
+        ③ JwtAuthGuard가 토큰 검증 → 유효하면 <code>req.user</code>에 페이로드 주입
+      </div>
+    </div>
+
+    <div class="section-title">요청 처리 레이어</div>
+    <div class="flow-wrap">
+      <div class="api-flow">
+        <div class="api-row">
+          <div class="api-layer" style="background:rgba(34,211,238,0.12);color:var(--cyan);">HTTP Request</div>
+          <div>클라이언트에서 API 요청</div>
+        </div>
+        <div class="api-row">
+          <div class="api-layer" style="background:rgba(251,191,36,0.12);color:var(--yellow);">Guard</div>
+          <div class="api-desc">JwtAuthGuard → 토큰 검증 / RolesGuard → 권한 확인</div>
+        </div>
+        <div class="api-row">
+          <div class="api-layer" style="background:rgba(167,139,250,0.12);color:var(--accent2);">Pipe</div>
+          <div class="api-desc">ValidationPipe → DTO 유효성 검사 (class-validator)</div>
+        </div>
+        <div class="api-row">
+          <div class="api-layer" style="background:rgba(108,138,255,0.12);color:var(--accent);">Controller</div>
+          <div class="api-desc">라우팅, 요청 파라미터 추출, Service 호출</div>
+        </div>
+        <div class="api-row">
+          <div class="api-layer" style="background:rgba(108,138,255,0.12);color:var(--accent);">Service</div>
+          <div class="api-desc">비즈니스 로직 처리 (핵심 로직, 유닛 테스트 대상)</div>
+        </div>
+        <div class="api-row">
+          <div class="api-layer" style="background:rgba(52,211,153,0.12);color:var(--green);">Repository</div>
+          <div class="api-desc">TypeORM Repository → SQLite DB 접근</div>
+        </div>
+        <div class="api-row">
+          <div class="api-layer" style="background:rgba(34,211,238,0.12);color:var(--cyan);">HTTP Response</div>
+          <div>JSON 응답 반환</div>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- ── Dependencies ── -->
+  <div id="deps" class="tab-content">
+    <div class="section-title">설치된 패키지 목록</div>
+    <div class="dep-wrap">
+      <div class="dep-section-label">dependencies (백엔드 런타임)</div>
+      <table class="dep-table">
+        <thead><tr><th>패키지</th><th>버전</th><th>용도</th></tr></thead>
+        <tbody>
+          <tr><td class="pkg">@nestjs/core</td><td class="pkg-ver">^11</td><td>NestJS 코어</td></tr>
+          <tr><td class="pkg">@nestjs/common</td><td class="pkg-ver">^11</td><td>데코레이터, 파이프, 가드 등</td></tr>
+          <tr><td class="pkg">@nestjs/platform-express</td><td class="pkg-ver">^11</td><td>Express 어댑터</td></tr>
+          <tr><td class="pkg">@nestjs/typeorm</td><td class="pkg-ver">^11</td><td>TypeORM NestJS 통합</td></tr>
+          <tr><td class="pkg">typeorm</td><td class="pkg-ver">^0.3</td><td>ORM 코어</td></tr>
+          <tr><td class="pkg">better-sqlite3</td><td class="pkg-ver">^11</td><td>SQLite 드라이버</td></tr>
+          <tr><td class="pkg">@nestjs/jwt</td><td class="pkg-ver">^11</td><td>JWT 발급·검증</td></tr>
+          <tr><td class="pkg">@nestjs/passport</td><td class="pkg-ver">^11</td><td>Passport NestJS 통합</td></tr>
+          <tr><td class="pkg">passport</td><td class="pkg-ver">^0.7</td><td>인증 미들웨어</td></tr>
+          <tr><td class="pkg">passport-jwt</td><td class="pkg-ver">^4</td><td>JWT Passport 전략</td></tr>
+          <tr><td class="pkg">@nestjs/swagger</td><td class="pkg-ver">^11</td><td>Swagger 문서 자동 생성</td></tr>
+          <tr><td class="pkg">bcryptjs</td><td class="pkg-ver">^2</td><td>비밀번호 해싱</td></tr>
+          <tr><td class="pkg">class-validator</td><td class="pkg-ver">^0.14</td><td>DTO 유효성 검사</td></tr>
+          <tr><td class="pkg">class-transformer</td><td class="pkg-ver">^0.5</td><td>DTO 변환</td></tr>
+          <tr><td class="pkg">dotenv</td><td class="pkg-ver">^17</td><td>환경변수 로드</td></tr>
+          <tr><td class="pkg">reflect-metadata</td><td class="pkg-ver">^0.2</td><td>데코레이터 메타데이터</td></tr>
+          <tr><td class="pkg">rxjs</td><td class="pkg-ver">^7</td><td>NestJS 내부 비동기 처리</td></tr>
+        </tbody>
+      </table>
+      <div class="dep-section-label">devDependencies (개발·빌드 도구)</div>
+      <table class="dep-table">
+        <tbody>
+          <tr><td class="pkg">@nestjs/cli</td><td class="pkg-ver">^11</td><td>NestJS CLI (글로벌 설치)</td></tr>
+          <tr><td class="pkg">typescript</td><td class="pkg-ver">^5</td><td>TypeScript 컴파일러</td></tr>
+          <tr><td class="pkg">jest</td><td class="pkg-ver">내장</td><td>테스트 프레임워크</td></tr>
+          <tr><td class="pkg">@types/bcryptjs</td><td class="pkg-ver">^2</td><td>bcryptjs 타입 정의</td></tr>
+          <tr><td class="pkg">@types/passport-jwt</td><td class="pkg-ver">^4</td><td>passport-jwt 타입 정의</td></tr>
+          <tr><td class="pkg">@types/better-sqlite3</td><td class="pkg-ver">^7</td><td>better-sqlite3 타입 정의</td></tr>
+          <tr><td class="pkg">eslint</td><td class="pkg-ver">내장</td><td>코드 린터</td></tr>
+          <tr><td class="pkg">prettier</td><td class="pkg-ver">내장</td><td>코드 포매터</td></tr>
+        </tbody>
+      </table>
+      <div class="dep-section-label">프론트엔드 (예정)</div>
+      <table class="dep-table">
+        <tbody>
+          <tr><td class="pkg">react</td><td class="pkg-ver">^19</td><td>UI 라이브러리</td></tr>
+          <tr><td class="pkg">vite</td><td class="pkg-ver">^6</td><td>번들러 · Dev Server</td></tr>
+          <tr><td class="pkg">tailwindcss</td><td class="pkg-ver">^4</td><td>유틸리티 CSS</td></tr>
+          <tr><td class="pkg">zustand</td><td class="pkg-ver">^5</td><td>상태 관리</td></tr>
+          <tr><td class="pkg">react-router-dom</td><td class="pkg-ver">^7</td><td>클라이언트 라우팅</td></tr>
+          <tr><td class="pkg">axios</td><td class="pkg-ver">^1</td><td>HTTP 클라이언트</td></tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  function showTab(id) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>

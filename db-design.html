@@ -1,0 +1,816 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Mall — DB 설계</title>
+  <script src="https://cdn.jsdelivr.net/npm/mermaid@10/dist/mermaid.min.js"></script>
+  <style>
+    :root {
+      --bg: #0f1117;
+      --surface: #1a1d27;
+      --surface2: #22263a;
+      --border: #2e3350;
+      --accent: #6c8aff;
+      --accent2: #a78bfa;
+      --green: #34d399;
+      --yellow: #fbbf24;
+      --red: #f87171;
+      --text: #e2e8f0;
+      --muted: #8892b0;
+    }
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: var(--bg);
+      color: var(--text);
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+    }
+
+    /* Header */
+    header {
+      background: linear-gradient(135deg, #1a1d27 0%, #151929 100%);
+      border-bottom: 1px solid var(--border);
+      padding: 2rem 3rem;
+    }
+    header h1 { font-size: 1.8rem; font-weight: 700; color: var(--accent); }
+    header p { color: var(--muted); margin-top: 0.3rem; font-size: 0.95rem; }
+
+    /* Nav Tabs */
+    nav {
+      display: flex;
+      gap: 0;
+      background: var(--surface);
+      border-bottom: 1px solid var(--border);
+      padding: 0 3rem;
+    }
+    nav button {
+      background: none;
+      border: none;
+      border-bottom: 3px solid transparent;
+      color: var(--muted);
+      cursor: pointer;
+      font-size: 0.9rem;
+      padding: 1rem 1.4rem;
+      transition: all 0.2s;
+    }
+    nav button:hover { color: var(--text); }
+    nav button.active {
+      color: var(--accent);
+      border-bottom-color: var(--accent);
+    }
+
+    /* Content */
+    main { padding: 2.5rem 3rem; max-width: 1400px; }
+    .tab-content { display: none; }
+    .tab-content.active { display: block; }
+
+    /* Section title */
+    .section-title {
+      font-size: 1.1rem;
+      font-weight: 600;
+      color: var(--accent2);
+      margin-bottom: 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+    .section-title::before {
+      content: '';
+      display: block;
+      width: 4px;
+      height: 1.1rem;
+      background: var(--accent2);
+      border-radius: 2px;
+    }
+
+    /* ER Diagram */
+    .mermaid-wrap {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 2rem;
+      overflow-x: auto;
+    }
+    .mermaid { min-width: 900px; }
+
+    /* Tables Grid */
+    .tables-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(400px, 1fr));
+      gap: 1.5rem;
+    }
+    .table-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      overflow: hidden;
+    }
+    .table-card-header {
+      background: var(--surface2);
+      border-bottom: 1px solid var(--border);
+      padding: 0.8rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.6rem;
+    }
+    .table-card-header .icon {
+      width: 28px; height: 28px;
+      border-radius: 6px;
+      display: flex; align-items: center; justify-content: center;
+      font-size: 0.85rem;
+      flex-shrink: 0;
+    }
+    .table-card-header h3 {
+      font-size: 0.95rem;
+      font-weight: 600;
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+    }
+    .table-card-header .badge {
+      margin-left: auto;
+      font-size: 0.72rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 99px;
+      font-weight: 500;
+    }
+    table { width: 100%; border-collapse: collapse; font-size: 0.85rem; }
+    th {
+      background: rgba(108,138,255,0.08);
+      color: var(--muted);
+      font-weight: 600;
+      font-size: 0.75rem;
+      letter-spacing: 0.05em;
+      padding: 0.55rem 1rem;
+      text-align: left;
+    }
+    td { padding: 0.55rem 1rem; border-top: 1px solid var(--border); }
+    tr:hover td { background: rgba(255,255,255,0.02); }
+    .col-name {
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      color: var(--green);
+      font-weight: 500;
+    }
+    .col-type {
+      color: var(--accent);
+      font-family: monospace;
+    }
+    .col-desc { color: var(--muted); font-size: 0.8rem; }
+    .tag {
+      display: inline-block;
+      font-size: 0.68rem;
+      padding: 0.1rem 0.45rem;
+      border-radius: 4px;
+      font-weight: 600;
+      margin-right: 2px;
+    }
+    .tag-pk { background: rgba(251,191,36,0.15); color: var(--yellow); }
+    .tag-fk { background: rgba(108,138,255,0.15); color: var(--accent); }
+    .tag-uq { background: rgba(52,211,153,0.15); color: var(--green); }
+    .tag-nn { background: rgba(248,113,113,0.12); color: var(--red); }
+
+    /* Relations */
+    .relations-wrap {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(340px, 1fr));
+      gap: 1rem;
+    }
+    .relation-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 10px;
+      padding: 1rem 1.2rem;
+      display: flex;
+      align-items: center;
+      gap: 0.8rem;
+    }
+    .rel-arrow {
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--muted);
+      flex: 1;
+      text-align: center;
+    }
+    .rel-entity {
+      background: var(--surface2);
+      border: 1px solid var(--border);
+      padding: 0.3rem 0.8rem;
+      border-radius: 6px;
+      font-family: monospace;
+      font-size: 0.85rem;
+      color: var(--accent);
+      font-weight: 600;
+    }
+    .rel-label {
+      font-size: 0.75rem;
+      color: var(--muted);
+    }
+
+    /* Modules */
+    .modules-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(320px, 1fr));
+      gap: 1.2rem;
+    }
+    .module-card {
+      background: var(--surface);
+      border: 1px solid var(--border);
+      border-radius: 12px;
+      padding: 1.2rem 1.4rem;
+    }
+    .module-name {
+      font-family: 'Cascadia Code', 'Fira Code', monospace;
+      font-size: 0.95rem;
+      font-weight: 700;
+      color: var(--accent);
+      margin-bottom: 0.6rem;
+    }
+    .module-desc {
+      font-size: 0.82rem;
+      color: var(--muted);
+      line-height: 1.7;
+    }
+    .module-desc li { margin-left: 1rem; }
+    .module-role {
+      display: inline-block;
+      margin-top: 0.6rem;
+      font-size: 0.72rem;
+      padding: 0.15rem 0.6rem;
+      border-radius: 99px;
+      font-weight: 600;
+    }
+    .role-public { background: rgba(52,211,153,0.15); color: var(--green); }
+    .role-user { background: rgba(108,138,255,0.15); color: var(--accent); }
+    .role-admin { background: rgba(251,191,36,0.15); color: var(--yellow); }
+    .role-both { background: rgba(167,139,250,0.15); color: var(--accent2); }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Shopping Mall — DB 설계</h1>
+  <p>NestJS + TypeORM + SQLite | 연습용 쇼핑몰 프로젝트</p>
+</header>
+
+<nav>
+  <button class="active" onclick="showTab('er')">ER 다이어그램</button>
+  <button onclick="showTab('tables')">테이블 상세</button>
+  <button onclick="showTab('relations')">관계 정의</button>
+  <button onclick="showTab('modules')">모듈 구성</button>
+  <button onclick="showTab('sql')">CREATE 문</button>
+</nav>
+
+<main>
+
+  <!-- ER Diagram -->
+  <div id="er" class="tab-content active">
+    <div class="section-title">Entity Relationship Diagram</div>
+    <div class="mermaid-wrap">
+      <div class="mermaid">
+erDiagram
+  USER {
+    int id PK
+    string email UK
+    string password
+    string name
+    string phone
+    string address
+    enum role
+    datetime createdAt
+  }
+  CATEGORY {
+    int id PK
+    string name UK
+    string description
+  }
+  PRODUCT {
+    int id PK
+    int categoryId FK
+    string name
+    text description
+    int price
+    int stock
+    string imageUrl
+    boolean isActive
+    datetime createdAt
+  }
+  CART {
+    int id PK
+    int userId FK
+  }
+  CART_ITEM {
+    int id PK
+    int cartId FK
+    int productId FK
+    int quantity
+  }
+  ORDER {
+    int id PK
+    int userId FK
+    int totalAmount
+    enum status
+    string shippingAddress
+    datetime createdAt
+    datetime updatedAt
+  }
+  ORDER_ITEM {
+    int id PK
+    int orderId FK
+    int productId FK
+    int quantity
+    int price
+  }
+  PAYMENT {
+    int id PK
+    int orderId FK
+    int amount
+    enum method
+    enum status
+    string transactionId
+    datetime paidAt
+  }
+
+  USER ||--o{ ORDER : "places"
+  USER ||--|| CART : "has"
+  CART ||--o{ CART_ITEM : "contains"
+  CART_ITEM }o--|| PRODUCT : "refers to"
+  ORDER ||--o{ ORDER_ITEM : "contains"
+  ORDER_ITEM }o--|| PRODUCT : "refers to"
+  ORDER ||--o| PAYMENT : "paid by"
+  PRODUCT }o--|| CATEGORY : "belongs to"
+      </div>
+    </div>
+  </div>
+
+  <!-- Tables -->
+  <div id="tables" class="tab-content">
+    <div class="section-title">테이블 상세 정의</div>
+    <div class="tables-grid">
+
+      <!-- User -->
+      <div class="table-card">
+        <div class="table-card-header">
+          <div class="icon" style="background:rgba(108,138,255,0.15);">👤</div>
+          <h3>User</h3>
+          <span class="badge" style="background:rgba(108,138,255,0.15);color:#6c8aff;">회원</span>
+        </div>
+        <table>
+          <thead><tr><th>컬럼</th><th>타입</th><th>제약</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td class="col-name">id</td><td class="col-type">INT</td><td><span class="tag tag-pk">PK</span></td><td class="col-desc">자동증가</td></tr>
+            <tr><td class="col-name">email</td><td class="col-type">VARCHAR</td><td><span class="tag tag-uq">UQ</span><span class="tag tag-nn">NN</span></td><td class="col-desc">로그인 이메일</td></tr>
+            <tr><td class="col-name">password</td><td class="col-type">VARCHAR</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">bcrypt 해시</td></tr>
+            <tr><td class="col-name">name</td><td class="col-type">VARCHAR</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">이름</td></tr>
+            <tr><td class="col-name">phone</td><td class="col-type">VARCHAR</td><td></td><td class="col-desc">전화번호 (선택)</td></tr>
+            <tr><td class="col-name">address</td><td class="col-type">VARCHAR</td><td></td><td class="col-desc">기본 배송지</td></tr>
+            <tr><td class="col-name">role</td><td class="col-type">ENUM</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">USER / ADMIN</td></tr>
+            <tr><td class="col-name">createdAt</td><td class="col-type">DATETIME</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">가입일</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Category -->
+      <div class="table-card">
+        <div class="table-card-header">
+          <div class="icon" style="background:rgba(52,211,153,0.15);">🏷️</div>
+          <h3>Category</h3>
+          <span class="badge" style="background:rgba(52,211,153,0.15);color:#34d399;">카테고리</span>
+        </div>
+        <table>
+          <thead><tr><th>컬럼</th><th>타입</th><th>제약</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td class="col-name">id</td><td class="col-type">INT</td><td><span class="tag tag-pk">PK</span></td><td class="col-desc">자동증가</td></tr>
+            <tr><td class="col-name">name</td><td class="col-type">VARCHAR</td><td><span class="tag tag-uq">UQ</span><span class="tag tag-nn">NN</span></td><td class="col-desc">카테고리명</td></tr>
+            <tr><td class="col-name">description</td><td class="col-type">VARCHAR</td><td></td><td class="col-desc">설명 (선택)</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Product -->
+      <div class="table-card">
+        <div class="table-card-header">
+          <div class="icon" style="background:rgba(167,139,250,0.15);">📦</div>
+          <h3>Product</h3>
+          <span class="badge" style="background:rgba(167,139,250,0.15);color:#a78bfa;">상품</span>
+        </div>
+        <table>
+          <thead><tr><th>컬럼</th><th>타입</th><th>제약</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td class="col-name">id</td><td class="col-type">INT</td><td><span class="tag tag-pk">PK</span></td><td class="col-desc">자동증가</td></tr>
+            <tr><td class="col-name">categoryId</td><td class="col-type">INT</td><td><span class="tag tag-fk">FK</span><span class="tag tag-nn">NN</span></td><td class="col-desc">→ Category</td></tr>
+            <tr><td class="col-name">name</td><td class="col-type">VARCHAR</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">상품명</td></tr>
+            <tr><td class="col-name">description</td><td class="col-type">TEXT</td><td></td><td class="col-desc">상품 설명</td></tr>
+            <tr><td class="col-name">price</td><td class="col-type">INT</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">원화 가격</td></tr>
+            <tr><td class="col-name">stock</td><td class="col-type">INT</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">재고 수량</td></tr>
+            <tr><td class="col-name">imageUrl</td><td class="col-type">VARCHAR</td><td></td><td class="col-desc">이미지 URL</td></tr>
+            <tr><td class="col-name">isActive</td><td class="col-type">BOOLEAN</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">판매 활성 여부</td></tr>
+            <tr><td class="col-name">createdAt</td><td class="col-type">DATETIME</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">등록일</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Cart -->
+      <div class="table-card">
+        <div class="table-card-header">
+          <div class="icon" style="background:rgba(251,191,36,0.15);">🛒</div>
+          <h3>Cart / CartItem</h3>
+          <span class="badge" style="background:rgba(251,191,36,0.15);color:#fbbf24;">장바구니</span>
+        </div>
+        <table>
+          <thead><tr><th>컬럼</th><th>타입</th><th>제약</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td class="col-name" colspan="4" style="background:rgba(255,255,255,0.02);color:var(--muted);font-size:0.78rem;padding:0.4rem 1rem;">Cart</td></tr>
+            <tr><td class="col-name">id</td><td class="col-type">INT</td><td><span class="tag tag-pk">PK</span></td><td class="col-desc">자동증가</td></tr>
+            <tr><td class="col-name">userId</td><td class="col-type">INT</td><td><span class="tag tag-fk">FK</span><span class="tag tag-uq">UQ</span></td><td class="col-desc">→ User (1:1)</td></tr>
+            <tr><td class="col-name" colspan="4" style="background:rgba(255,255,255,0.02);color:var(--muted);font-size:0.78rem;padding:0.4rem 1rem;">CartItem</td></tr>
+            <tr><td class="col-name">id</td><td class="col-type">INT</td><td><span class="tag tag-pk">PK</span></td><td class="col-desc">자동증가</td></tr>
+            <tr><td class="col-name">cartId</td><td class="col-type">INT</td><td><span class="tag tag-fk">FK</span></td><td class="col-desc">→ Cart</td></tr>
+            <tr><td class="col-name">productId</td><td class="col-type">INT</td><td><span class="tag tag-fk">FK</span></td><td class="col-desc">→ Product</td></tr>
+            <tr><td class="col-name">quantity</td><td class="col-type">INT</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">수량</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Order -->
+      <div class="table-card">
+        <div class="table-card-header">
+          <div class="icon" style="background:rgba(248,113,113,0.15);">📋</div>
+          <h3>Order / OrderItem</h3>
+          <span class="badge" style="background:rgba(248,113,113,0.15);color:#f87171;">주문</span>
+        </div>
+        <table>
+          <thead><tr><th>컬럼</th><th>타입</th><th>제약</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td class="col-name" colspan="4" style="background:rgba(255,255,255,0.02);color:var(--muted);font-size:0.78rem;padding:0.4rem 1rem;">Order</td></tr>
+            <tr><td class="col-name">id</td><td class="col-type">INT</td><td><span class="tag tag-pk">PK</span></td><td class="col-desc">자동증가</td></tr>
+            <tr><td class="col-name">userId</td><td class="col-type">INT</td><td><span class="tag tag-fk">FK</span><span class="tag tag-nn">NN</span></td><td class="col-desc">→ User</td></tr>
+            <tr><td class="col-name">totalAmount</td><td class="col-type">INT</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">결제 총액</td></tr>
+            <tr><td class="col-name">status</td><td class="col-type">ENUM</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">PENDING/PAID/SHIPPING/DELIVERED/CANCELLED</td></tr>
+            <tr><td class="col-name">shippingAddress</td><td class="col-type">VARCHAR</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">배송지 스냅샷</td></tr>
+            <tr><td class="col-name">createdAt</td><td class="col-type">DATETIME</td><td></td><td class="col-desc">주문일</td></tr>
+            <tr><td class="col-name">updatedAt</td><td class="col-type">DATETIME</td><td></td><td class="col-desc">수정일</td></tr>
+            <tr><td class="col-name" colspan="4" style="background:rgba(255,255,255,0.02);color:var(--muted);font-size:0.78rem;padding:0.4rem 1rem;">OrderItem</td></tr>
+            <tr><td class="col-name">id</td><td class="col-type">INT</td><td><span class="tag tag-pk">PK</span></td><td class="col-desc">자동증가</td></tr>
+            <tr><td class="col-name">orderId</td><td class="col-type">INT</td><td><span class="tag tag-fk">FK</span></td><td class="col-desc">→ Order</td></tr>
+            <tr><td class="col-name">productId</td><td class="col-type">INT</td><td><span class="tag tag-fk">FK</span></td><td class="col-desc">→ Product</td></tr>
+            <tr><td class="col-name">quantity</td><td class="col-type">INT</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">수량</td></tr>
+            <tr><td class="col-name">price</td><td class="col-type">INT</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">⚠️ 주문 시점 가격 스냅샷</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+      <!-- Payment -->
+      <div class="table-card">
+        <div class="table-card-header">
+          <div class="icon" style="background:rgba(52,211,153,0.15);">💳</div>
+          <h3>Payment</h3>
+          <span class="badge" style="background:rgba(52,211,153,0.15);color:#34d399;">결제</span>
+        </div>
+        <table>
+          <thead><tr><th>컬럼</th><th>타입</th><th>제약</th><th>설명</th></tr></thead>
+          <tbody>
+            <tr><td class="col-name">id</td><td class="col-type">INT</td><td><span class="tag tag-pk">PK</span></td><td class="col-desc">자동증가</td></tr>
+            <tr><td class="col-name">orderId</td><td class="col-type">INT</td><td><span class="tag tag-fk">FK</span><span class="tag tag-uq">UQ</span></td><td class="col-desc">→ Order (1:1)</td></tr>
+            <tr><td class="col-name">amount</td><td class="col-type">INT</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">결제 금액</td></tr>
+            <tr><td class="col-name">method</td><td class="col-type">ENUM</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">CARD / BANK_TRANSFER / VIRTUAL_ACCOUNT</td></tr>
+            <tr><td class="col-name">status</td><td class="col-type">ENUM</td><td><span class="tag tag-nn">NN</span></td><td class="col-desc">PENDING / SUCCESS / FAILED / REFUNDED</td></tr>
+            <tr><td class="col-name">transactionId</td><td class="col-type">VARCHAR</td><td></td><td class="col-desc">PG사 거래 ID</td></tr>
+            <tr><td class="col-name">paidAt</td><td class="col-type">DATETIME</td><td></td><td class="col-desc">결제 완료 시각</td></tr>
+          </tbody>
+        </table>
+      </div>
+
+    </div>
+  </div>
+
+  <!-- Relations -->
+  <div id="relations" class="tab-content">
+    <div class="section-title">관계 정의</div>
+    <div class="relations-wrap">
+      <div class="relation-card">
+        <div class="rel-entity">User</div>
+        <div style="text-align:center">
+          <div class="rel-arrow">1 ──< N</div>
+          <div class="rel-label">places</div>
+        </div>
+        <div class="rel-entity">Order</div>
+      </div>
+      <div class="relation-card">
+        <div class="rel-entity">User</div>
+        <div style="text-align:center">
+          <div class="rel-arrow">1 ── 1</div>
+          <div class="rel-label">has</div>
+        </div>
+        <div class="rel-entity">Cart</div>
+      </div>
+      <div class="relation-card">
+        <div class="rel-entity">Cart</div>
+        <div style="text-align:center">
+          <div class="rel-arrow">1 ──< N</div>
+          <div class="rel-label">contains</div>
+        </div>
+        <div class="rel-entity">CartItem</div>
+      </div>
+      <div class="relation-card">
+        <div class="rel-entity">CartItem</div>
+        <div style="text-align:center">
+          <div class="rel-arrow">N >── 1</div>
+          <div class="rel-label">refers to</div>
+        </div>
+        <div class="rel-entity">Product</div>
+      </div>
+      <div class="relation-card">
+        <div class="rel-entity">Order</div>
+        <div style="text-align:center">
+          <div class="rel-arrow">1 ──< N</div>
+          <div class="rel-label">contains</div>
+        </div>
+        <div class="rel-entity">OrderItem</div>
+      </div>
+      <div class="relation-card">
+        <div class="rel-entity">OrderItem</div>
+        <div style="text-align:center">
+          <div class="rel-arrow">N >── 1</div>
+          <div class="rel-label">refers to</div>
+        </div>
+        <div class="rel-entity">Product</div>
+      </div>
+      <div class="relation-card">
+        <div class="rel-entity">Order</div>
+        <div style="text-align:center">
+          <div class="rel-arrow">1 ── 0..1</div>
+          <div class="rel-label">paid by</div>
+        </div>
+        <div class="rel-entity">Payment</div>
+      </div>
+      <div class="relation-card">
+        <div class="rel-entity">Product</div>
+        <div style="text-align:center">
+          <div class="rel-arrow">N >── 1</div>
+          <div class="rel-label">belongs to</div>
+        </div>
+        <div class="rel-entity">Category</div>
+      </div>
+    </div>
+
+    <br/>
+    <div class="section-title">설계 포인트</div>
+    <div class="tables-grid">
+      <div class="table-card" style="padding:1.2rem 1.4rem;">
+        <div style="color:var(--yellow);font-weight:600;margin-bottom:0.5rem;">⚠️ 가격 스냅샷 (OrderItem.price)</div>
+        <div style="color:var(--muted);font-size:0.85rem;line-height:1.7;">
+          상품 가격은 언제든 바뀔 수 있음. 주문 당시 가격을 OrderItem에 별도로 저장해 두어야 주문 내역이 변경 전 가격으로 올바르게 표시됨.
+        </div>
+      </div>
+      <div class="table-card" style="padding:1.2rem 1.4rem;">
+        <div style="color:var(--green);font-weight:600;margin-bottom:0.5rem;">✅ Cart는 회원당 1개</div>
+        <div style="color:var(--muted);font-size:0.85rem;line-height:1.7;">
+          Cart.userId에 unique 제약. 로그인 시 자동 생성. 장바구니 항목은 CartItem으로 분리해 수량 관리.
+        </div>
+      </div>
+      <div class="table-card" style="padding:1.2rem 1.4rem;">
+        <div style="color:var(--accent);font-weight:600;margin-bottom:0.5rem;">🔐 Role 기반 접근 제어</div>
+        <div style="color:var(--muted);font-size:0.85rem;line-height:1.7;">
+          User.role = ADMIN인 경우 관리자 API 접근 가능. NestJS Guard + Decorator로 엔드포인트별 권한 제어.
+        </div>
+      </div>
+      <div class="table-card" style="padding:1.2rem 1.4rem;">
+        <div style="color:var(--accent2);font-weight:600;margin-bottom:0.5rem;">💳 Payment는 Order와 1:1</div>
+        <div style="color:var(--muted);font-size:0.85rem;line-height:1.7;">
+          주문 하나에 결제 레코드 하나. 재결제(환불 후 재시도) 시나리오는 Payment를 새로 생성하는 방식으로 처리.
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Modules -->
+  <div id="modules" class="tab-content">
+    <div class="section-title">NestJS 모듈 구성</div>
+    <div class="modules-grid">
+
+      <div class="module-card">
+        <div class="module-name">AuthModule</div>
+        <ul class="module-desc">
+          <li>POST /auth/register — 회원가입</li>
+          <li>POST /auth/login — 로그인 (JWT 발급)</li>
+          <li>GET /auth/me — 내 정보</li>
+        </ul>
+        <span class="module-role role-public">Public</span>
+      </div>
+
+      <div class="module-card">
+        <div class="module-name">UserModule</div>
+        <ul class="module-desc">
+          <li>GET /users/me — 내 프로필 조회</li>
+          <li>PATCH /users/me — 내 정보 수정</li>
+          <li>GET /users — 전체 회원 목록 (관리자)</li>
+        </ul>
+        <span class="module-role role-both">User + Admin</span>
+      </div>
+
+      <div class="module-card">
+        <div class="module-name">CategoryModule</div>
+        <ul class="module-desc">
+          <li>GET /categories — 목록 (공개)</li>
+          <li>POST /categories — 생성 (관리자)</li>
+          <li>PATCH /categories/:id — 수정 (관리자)</li>
+          <li>DELETE /categories/:id — 삭제 (관리자)</li>
+        </ul>
+        <span class="module-role role-admin">Admin</span>
+      </div>
+
+      <div class="module-card">
+        <div class="module-name">ProductModule</div>
+        <ul class="module-desc">
+          <li>GET /products — 목록 (공개, 필터/정렬)</li>
+          <li>GET /products/:id — 상세 (공개)</li>
+          <li>POST /products — 등록 (관리자)</li>
+          <li>PATCH /products/:id — 수정 (관리자)</li>
+          <li>DELETE /products/:id — 삭제 (관리자)</li>
+        </ul>
+        <span class="module-role role-both">Public + Admin</span>
+      </div>
+
+      <div class="module-card">
+        <div class="module-name">CartModule</div>
+        <ul class="module-desc">
+          <li>GET /cart — 내 장바구니 조회</li>
+          <li>POST /cart/items — 상품 추가</li>
+          <li>PATCH /cart/items/:id — 수량 수정</li>
+          <li>DELETE /cart/items/:id — 항목 삭제</li>
+        </ul>
+        <span class="module-role role-user">User</span>
+      </div>
+
+      <div class="module-card">
+        <div class="module-name">OrderModule</div>
+        <ul class="module-desc">
+          <li>POST /orders — 주문 생성 (장바구니 → 주문)</li>
+          <li>GET /orders — 내 주문 목록</li>
+          <li>GET /orders/:id — 주문 상세</li>
+          <li>DELETE /orders/:id — 주문 취소</li>
+          <li>GET /admin/orders — 전체 주문 (관리자)</li>
+          <li>PATCH /admin/orders/:id/status — 상태 변경 (관리자)</li>
+        </ul>
+        <span class="module-role role-both">User + Admin</span>
+      </div>
+
+      <div class="module-card">
+        <div class="module-name">PaymentModule</div>
+        <ul class="module-desc">
+          <li>POST /payments — 결제 요청</li>
+          <li>POST /payments/callback — PG 콜백 (Mock)</li>
+          <li>GET /payments/:orderId — 결제 상태 조회</li>
+          <li>POST /payments/:id/refund — 환불 요청</li>
+        </ul>
+        <span class="module-role role-user">User</span>
+      </div>
+
+    </div>
+
+    <br/>
+    <div class="section-title">디렉토리 구조 (예정)</div>
+    <div class="mermaid-wrap" style="font-family:monospace;font-size:0.85rem;color:var(--text);line-height:1.8;white-space:pre;">
+shopping/
+├── backend/
+│   ├── src/
+│   │   ├── auth/
+│   │   ├── user/
+│   │   ├── category/
+│   │   ├── product/
+│   │   ├── cart/
+│   │   ├── order/
+│   │   ├── payment/
+│   │   ├── common/        ← guards, decorators, filters
+│   │   └── main.ts
+│   ├── .env
+│   └── package.json
+└── frontend/              ← 추후 구현
+    ├── src/
+    └── package.json
+    </div>
+  </div>
+
+  <!-- SQL CREATE -->
+  <div id="sql" class="tab-content">
+    <div class="section-title">SQLite CREATE 문</div>
+    <div class="mermaid-wrap" style="font-family:'Cascadia Code','Fira Code',monospace;font-size:0.82rem;line-height:1.9;white-space:pre;overflow-x:auto;color:var(--text);">
+<span style="color:var(--muted);">-- ① 카테고리 (의존 없음, 먼저 생성)</span>
+<span style="color:var(--accent);">CREATE TABLE</span> <span style="color:var(--green);">category</span> (
+  <span style="color:var(--yellow);">id</span>          INTEGER  <span style="color:var(--accent2);">PRIMARY KEY AUTOINCREMENT</span>,
+  <span style="color:var(--yellow);">name</span>        VARCHAR  <span style="color:var(--red);">NOT NULL UNIQUE</span>,
+  <span style="color:var(--yellow);">description</span> VARCHAR
+);
+
+<span style="color:var(--muted);">-- ② 회원</span>
+<span style="color:var(--accent);">CREATE TABLE</span> <span style="color:var(--green);">user</span> (
+  <span style="color:var(--yellow);">id</span>          INTEGER  <span style="color:var(--accent2);">PRIMARY KEY AUTOINCREMENT</span>,
+  <span style="color:var(--yellow);">email</span>       VARCHAR  <span style="color:var(--red);">NOT NULL UNIQUE</span>,
+  <span style="color:var(--yellow);">password</span>    VARCHAR  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">name</span>        VARCHAR  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">phone</span>       VARCHAR,
+  <span style="color:var(--yellow);">address</span>     VARCHAR,
+  <span style="color:var(--yellow);">role</span>        TEXT     <span style="color:var(--red);">NOT NULL</span> DEFAULT <span style="color:var(--green);">'USER'</span>,  <span style="color:var(--muted);">-- 'USER' | 'ADMIN'</span>
+  <span style="color:var(--yellow);">createdAt</span>   DATETIME <span style="color:var(--red);">NOT NULL</span> DEFAULT (datetime('now'))
+);
+
+<span style="color:var(--muted);">-- ③ 상품 (category 참조)</span>
+<span style="color:var(--accent);">CREATE TABLE</span> <span style="color:var(--green);">product</span> (
+  <span style="color:var(--yellow);">id</span>          INTEGER  <span style="color:var(--accent2);">PRIMARY KEY AUTOINCREMENT</span>,
+  <span style="color:var(--yellow);">categoryId</span>  INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">name</span>        VARCHAR  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">description</span> TEXT,
+  <span style="color:var(--yellow);">price</span>       INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">stock</span>       INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">imageUrl</span>    VARCHAR,
+  <span style="color:var(--yellow);">isActive</span>    BOOLEAN  <span style="color:var(--red);">NOT NULL</span> DEFAULT 1,
+  <span style="color:var(--yellow);">createdAt</span>   DATETIME <span style="color:var(--red);">NOT NULL</span> DEFAULT (datetime('now')),
+  <span style="color:var(--accent2);">FOREIGN KEY</span> (categoryId) <span style="color:var(--accent2);">REFERENCES</span> category(id)
+);
+
+<span style="color:var(--muted);">-- ④ 장바구니 (user와 1:1)</span>
+<span style="color:var(--accent);">CREATE TABLE</span> <span style="color:var(--green);">cart</span> (
+  <span style="color:var(--yellow);">id</span>          INTEGER  <span style="color:var(--accent2);">PRIMARY KEY AUTOINCREMENT</span>,
+  <span style="color:var(--yellow);">userId</span>      INTEGER  <span style="color:var(--red);">NOT NULL UNIQUE</span>,
+  <span style="color:var(--accent2);">FOREIGN KEY</span> (userId) <span style="color:var(--accent2);">REFERENCES</span> user(id)
+);
+
+<span style="color:var(--muted);">-- ⑤ 장바구니 항목</span>
+<span style="color:var(--accent);">CREATE TABLE</span> <span style="color:var(--green);">cart_item</span> (
+  <span style="color:var(--yellow);">id</span>          INTEGER  <span style="color:var(--accent2);">PRIMARY KEY AUTOINCREMENT</span>,
+  <span style="color:var(--yellow);">cartId</span>      INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">productId</span>   INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">quantity</span>    INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--accent2);">FOREIGN KEY</span> (cartId)    <span style="color:var(--accent2);">REFERENCES</span> cart(id),
+  <span style="color:var(--accent2);">FOREIGN KEY</span> (productId) <span style="color:var(--accent2);">REFERENCES</span> product(id)
+);
+
+<span style="color:var(--muted);">-- ⑥ 주문 (order는 예약어라 큰따옴표 처리)</span>
+<span style="color:var(--accent);">CREATE TABLE</span> <span style="color:var(--green);">"order"</span> (
+  <span style="color:var(--yellow);">id</span>              INTEGER  <span style="color:var(--accent2);">PRIMARY KEY AUTOINCREMENT</span>,
+  <span style="color:var(--yellow);">userId</span>          INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">totalAmount</span>     INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">status</span>          TEXT     <span style="color:var(--red);">NOT NULL</span> DEFAULT <span style="color:var(--green);">'PENDING'</span>,
+  <span style="color:var(--muted);">                                              -- 'PENDING'|'PAID'|'SHIPPING'|'DELIVERED'|'CANCELLED'</span>
+  <span style="color:var(--yellow);">shippingAddress</span> VARCHAR  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">createdAt</span>       DATETIME NOT NULL DEFAULT (datetime('now')),
+  <span style="color:var(--yellow);">updatedAt</span>       DATETIME NOT NULL DEFAULT (datetime('now')),
+  <span style="color:var(--accent2);">FOREIGN KEY</span> (userId) <span style="color:var(--accent2);">REFERENCES</span> user(id)
+);
+
+<span style="color:var(--muted);">-- ⑦ 주문 항목 (가격 스냅샷 포함)</span>
+<span style="color:var(--accent);">CREATE TABLE</span> <span style="color:var(--green);">order_item</span> (
+  <span style="color:var(--yellow);">id</span>          INTEGER  <span style="color:var(--accent2);">PRIMARY KEY AUTOINCREMENT</span>,
+  <span style="color:var(--yellow);">orderId</span>     INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">productId</span>   INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">quantity</span>    INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">price</span>       INTEGER  <span style="color:var(--red);">NOT NULL</span>,  <span style="color:var(--muted);">-- ⚠️ 주문 시점 가격 스냅샷</span>
+  <span style="color:var(--accent2);">FOREIGN KEY</span> (orderId)   <span style="color:var(--accent2);">REFERENCES</span> "order"(id),
+  <span style="color:var(--accent2);">FOREIGN KEY</span> (productId) <span style="color:var(--accent2);">REFERENCES</span> product(id)
+);
+
+<span style="color:var(--muted);">-- ⑧ 결제 (order와 1:1)</span>
+<span style="color:var(--accent);">CREATE TABLE</span> <span style="color:var(--green);">payment</span> (
+  <span style="color:var(--yellow);">id</span>              INTEGER  <span style="color:var(--accent2);">PRIMARY KEY AUTOINCREMENT</span>,
+  <span style="color:var(--yellow);">orderId</span>         INTEGER  <span style="color:var(--red);">NOT NULL UNIQUE</span>,
+  <span style="color:var(--yellow);">amount</span>          INTEGER  <span style="color:var(--red);">NOT NULL</span>,
+  <span style="color:var(--yellow);">method</span>          TEXT     <span style="color:var(--red);">NOT NULL</span>,  <span style="color:var(--muted);">-- 'CARD'|'BANK_TRANSFER'|'VIRTUAL_ACCOUNT'</span>
+  <span style="color:var(--yellow);">status</span>          TEXT     <span style="color:var(--red);">NOT NULL</span> DEFAULT <span style="color:var(--green);">'PENDING'</span>,
+  <span style="color:var(--muted);">                                         -- 'PENDING'|'SUCCESS'|'FAILED'|'REFUNDED'</span>
+  <span style="color:var(--yellow);">transactionId</span>   VARCHAR,               <span style="color:var(--muted);">-- Mock PG 거래 ID</span>
+  <span style="color:var(--yellow);">paidAt</span>          DATETIME,
+  <span style="color:var(--accent2);">FOREIGN KEY</span> (orderId) <span style="color:var(--accent2);">REFERENCES</span> "order"(id)
+);
+    </div>
+    <br/>
+    <div class="section-title">참고 사항</div>
+    <div class="tables-grid">
+      <div class="table-card" style="padding:1.2rem 1.4rem;">
+        <div style="color:var(--yellow);font-weight:600;margin-bottom:0.5rem;">TypeORM synchronize: true</div>
+        <div style="color:var(--muted);font-size:0.85rem;line-height:1.7;">
+          개발 중에는 TypeORM이 엔티티를 읽어 자동으로 위 CREATE 문을 실행합니다. 직접 실행할 필요 없으며, 엔티티 변경 시 스키마도 자동 반영됩니다.
+        </div>
+      </div>
+      <div class="table-card" style="padding:1.2rem 1.4rem;">
+        <div style="color:var(--accent);font-weight:600;margin-bottom:0.5rem;">생성 순서 중요</div>
+        <div style="color:var(--muted);font-size:0.85rem;line-height:1.7;">
+          FK 제약 때문에 참조 대상 테이블이 먼저 있어야 합니다.<br/>
+          category → user → product → cart → cart_item → order → order_item → payment
+        </div>
+      </div>
+    </div>
+  </div>
+
+</main>
+
+<script>
+  mermaid.initialize({ startOnLoad: true, theme: 'dark' });
+
+  function showTab(id) {
+    document.querySelectorAll('.tab-content').forEach(el => el.classList.remove('active'));
+    document.querySelectorAll('nav button').forEach(el => el.classList.remove('active'));
+    document.getElementById(id).classList.add('active');
+    event.target.classList.add('active');
+  }
+</script>
+</body>
+</html>
