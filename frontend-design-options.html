@@ -1,0 +1,694 @@
+<!DOCTYPE html>
+<html lang="ko">
+<head>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Shopping Mall — 프론트엔드 디자인 옵션</title>
+  <style>
+    * { box-sizing: border-box; margin: 0; padding: 0; }
+    body {
+      background: #0f1117;
+      color: #e2e8f0;
+      font-family: 'Segoe UI', system-ui, sans-serif;
+      line-height: 1.6;
+    }
+    header {
+      background: linear-gradient(135deg,#1a1d27,#151929);
+      border-bottom: 1px solid #2e3350;
+      padding: 1.8rem 3rem;
+    }
+    header h1 { font-size: 1.6rem; font-weight: 700; color: #6c8aff; }
+    header p { color: #8892b0; margin-top: 0.2rem; font-size: 0.9rem; }
+
+    .page-wrap { padding: 2.5rem 3rem; max-width: 1500px; }
+
+    .intro {
+      background: #1a1d27; border: 1px solid #2e3350; border-radius: 12px;
+      padding: 1.2rem 1.6rem; margin-bottom: 2.5rem;
+      font-size: 0.88rem; color: #8892b0; line-height: 1.8;
+    }
+    .intro strong { color: #e2e8f0; }
+
+    /* ── 옵션 그리드 ── */
+    .options-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fill, minmax(420px, 1fr));
+      gap: 2rem;
+    }
+
+    .option-wrap {
+      border: 2px solid #2e3350;
+      border-radius: 16px;
+      overflow: hidden;
+      transition: border-color 0.2s, transform 0.2s;
+      cursor: pointer;
+    }
+    .option-wrap:hover { transform: translateY(-3px); }
+    .option-wrap.selected { border-color: #6c8aff; }
+
+    .option-label {
+      background: #1a1d27;
+      padding: 0.9rem 1.2rem;
+      display: flex; align-items: center; gap: 0.8rem;
+      border-bottom: 1px solid #2e3350;
+    }
+    .option-num {
+      width: 28px; height: 28px; border-radius: 50%;
+      background: rgba(108,138,255,0.15); color: #6c8aff;
+      font-size: 0.8rem; font-weight: 800;
+      display: flex; align-items: center; justify-content: center;
+    }
+    .option-name { font-size: 1rem; font-weight: 700; color: #e2e8f0; }
+    .option-sub { font-size: 0.78rem; color: #8892b0; margin-top: 0.1rem; }
+    .option-tags { display: flex; gap: 0.4rem; margin-left: auto; flex-wrap: wrap; justify-content: flex-end; }
+    .otag {
+      font-size: 0.68rem; padding: 0.15rem 0.5rem; border-radius: 99px;
+      font-weight: 600;
+    }
+
+    /* 미리보기 영역 */
+    .preview { position: relative; }
+
+    /* ═══════════════════════════════════════════
+       OPTION 1: 모던 다크 (Modern Dark)
+    ═══════════════════════════════════════════ */
+    .p1 { background: #0d0d0f; font-family: 'Segoe UI', sans-serif; padding-bottom: 1.2rem; }
+    .p1-nav {
+      background: rgba(13,13,15,0.95);
+      border-bottom: 1px solid rgba(255,255,255,0.06);
+      padding: 0 1.4rem; height: 56px;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .p1-logo { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: -0.02em; }
+    .p1-logo span { color: #7c3aed; }
+    .p1-nav-links { display: flex; gap: 1.2rem; margin-left: auto; font-size: 0.8rem; color: rgba(255,255,255,0.5); }
+    .p1-nav-links span { cursor: pointer; transition: color 0.15s; }
+    .p1-nav-links span:hover { color: #fff; }
+    .p1-btn {
+      background: #7c3aed; color: #fff; border: none;
+      padding: 0.4rem 0.9rem; border-radius: 6px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+    }
+    .p1-cards { display: flex; gap: 0.8rem; padding: 1rem 1.4rem 0; }
+    .p1-card {
+      background: #18181b; border: 1px solid rgba(255,255,255,0.06);
+      border-radius: 10px; overflow: hidden; flex: 1;
+    }
+    .p1-card-img { height: 90px; background: linear-gradient(135deg,#1e1e24,#27272a); display:flex;align-items:center;justify-content:center;font-size:1.8rem; }
+    .p1-card-body { padding: 0.7rem; }
+    .p1-card-name { font-size: 0.78rem; font-weight: 600; color: #fff; }
+    .p1-card-price { font-size: 0.82rem; font-weight: 700; color: #a78bfa; margin-top: 0.2rem; }
+    .p1-card-btn {
+      width: 100%; margin-top: 0.5rem; background: rgba(124,58,237,0.15);
+      border: 1px solid rgba(124,58,237,0.3); color: #a78bfa;
+      padding: 0.3rem; border-radius: 5px; font-size: 0.72rem; cursor: pointer;
+    }
+    .p1-palette { display: flex; gap: 0.4rem; padding: 0.8rem 1.4rem 0; }
+    .p1-palette div { height: 16px; border-radius: 4px; flex: 1; }
+
+    /* ═══════════════════════════════════════════
+       OPTION 2: 클린 화이트 (Clean White)
+    ═══════════════════════════════════════════ */
+    .p2 { background: #f8f9fa; font-family: 'Segoe UI', sans-serif; padding-bottom: 1.2rem; }
+    .p2-nav {
+      background: #fff; border-bottom: 1px solid #e9ecef;
+      padding: 0 1.4rem; height: 56px;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .p2-logo { font-size: 1rem; font-weight: 800; color: #1a1a2e; letter-spacing: -0.02em; }
+    .p2-logo span { color: #ff6b6b; }
+    .p2-nav-links { display: flex; gap: 1.2rem; margin-left: auto; font-size: 0.8rem; color: #6c757d; }
+    .p2-btn {
+      background: #ff6b6b; color: #fff; border: none;
+      padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.75rem; font-weight: 600; cursor: pointer;
+    }
+    .p2-cards { display: flex; gap: 0.8rem; padding: 1rem 1.4rem 0; }
+    .p2-card {
+      background: #fff; border: 1px solid #e9ecef;
+      border-radius: 12px; overflow: hidden; flex: 1;
+      box-shadow: 0 2px 8px rgba(0,0,0,0.06);
+    }
+    .p2-card-img { height: 90px; background: linear-gradient(135deg,#fff5f5,#ffe3e3); display:flex;align-items:center;justify-content:center;font-size:1.8rem; }
+    .p2-card-body { padding: 0.7rem; }
+    .p2-card-name { font-size: 0.78rem; font-weight: 600; color: #1a1a2e; }
+    .p2-card-price { font-size: 0.82rem; font-weight: 700; color: #ff6b6b; margin-top: 0.2rem; }
+    .p2-card-btn {
+      width: 100%; margin-top: 0.5rem; background: #ff6b6b;
+      border: none; color: #fff;
+      padding: 0.3rem; border-radius: 20px; font-size: 0.72rem; cursor: pointer;
+    }
+    .p2-palette { display: flex; gap: 0.4rem; padding: 0.8rem 1.4rem 0; }
+    .p2-palette div { height: 16px; border-radius: 4px; flex: 1; }
+
+    /* ═══════════════════════════════════════════
+       OPTION 3: 럭셔리 블랙 (Luxury Black & Gold)
+    ═══════════════════════════════════════════ */
+    .p3 { background: #080808; font-family: 'Segoe UI', sans-serif; padding-bottom: 1.2rem; }
+    .p3-nav {
+      background: #080808; border-bottom: 1px solid #2a2a2a;
+      padding: 0 1.4rem; height: 56px;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .p3-logo { font-size: 1rem; font-weight: 300; color: #fff; letter-spacing: 0.15em; text-transform: uppercase; }
+    .p3-logo span { color: #c9a84c; }
+    .p3-nav-links { display: flex; gap: 1.2rem; margin-left: auto; font-size: 0.72rem; color: #666; letter-spacing: 0.08em; text-transform: uppercase; }
+    .p3-btn {
+      background: transparent; color: #c9a84c; border: 1px solid #c9a84c;
+      padding: 0.35rem 0.9rem; border-radius: 0; font-size: 0.7rem; font-weight: 400; cursor: pointer; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .p3-cards { display: flex; gap: 0.8rem; padding: 1rem 1.4rem 0; }
+    .p3-card {
+      background: #111; border: 1px solid #222;
+      overflow: hidden; flex: 1;
+    }
+    .p3-card-img { height: 90px; background: linear-gradient(135deg,#111,#1a1a1a); display:flex;align-items:center;justify-content:center;font-size:1.8rem; border-bottom: 1px solid #222; }
+    .p3-card-body { padding: 0.7rem; }
+    .p3-card-name { font-size: 0.72rem; font-weight: 300; color: #ccc; letter-spacing: 0.05em; text-transform: uppercase; }
+    .p3-card-price { font-size: 0.82rem; font-weight: 400; color: #c9a84c; margin-top: 0.3rem; letter-spacing: 0.05em; }
+    .p3-card-btn {
+      width: 100%; margin-top: 0.5rem; background: transparent;
+      border: 1px solid #c9a84c; color: #c9a84c;
+      padding: 0.3rem; font-size: 0.68rem; cursor: pointer; letter-spacing: 0.1em; text-transform: uppercase;
+    }
+    .p3-palette { display: flex; gap: 0.4rem; padding: 0.8rem 1.4rem 0; }
+    .p3-palette div { height: 16px; flex: 1; }
+
+    /* ═══════════════════════════════════════════
+       OPTION 4: 비비드 그라디언트 (Vivid Gradient)
+    ═══════════════════════════════════════════ */
+    .p4 { background: #fafafa; font-family: 'Segoe UI', sans-serif; padding-bottom: 1.2rem; }
+    .p4-nav {
+      background: linear-gradient(90deg,#667eea,#764ba2);
+      padding: 0 1.4rem; height: 56px;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .p4-logo { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
+    .p4-nav-links { display: flex; gap: 1.2rem; margin-left: auto; font-size: 0.8rem; color: rgba(255,255,255,0.75); }
+    .p4-btn {
+      background: #fff; color: #764ba2; border: none;
+      padding: 0.4rem 0.9rem; border-radius: 20px; font-size: 0.75rem; font-weight: 700; cursor: pointer;
+    }
+    .p4-cards { display: flex; gap: 0.8rem; padding: 1rem 1.4rem 0; }
+    .p4-card {
+      background: #fff; border-radius: 14px; overflow: hidden; flex: 1;
+      box-shadow: 0 4px 20px rgba(102,126,234,0.15);
+    }
+    .p4-card-img { height: 90px; display:flex;align-items:center;justify-content:center;font-size:1.8rem; }
+    .p4-card-body { padding: 0.7rem; }
+    .p4-card-name { font-size: 0.78rem; font-weight: 600; color: #2d3748; }
+    .p4-card-price { font-size: 0.82rem; font-weight: 700; background: linear-gradient(90deg,#667eea,#764ba2); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-top: 0.2rem; }
+    .p4-card-btn {
+      width: 100%; margin-top: 0.5rem;
+      background: linear-gradient(90deg,#667eea,#764ba2);
+      border: none; color: #fff;
+      padding: 0.3rem; border-radius: 20px; font-size: 0.72rem; cursor: pointer;
+    }
+    .p4-palette { display: flex; gap: 0.4rem; padding: 0.8rem 1.4rem 0; }
+    .p4-palette div { height: 16px; border-radius: 4px; flex: 1; }
+
+    /* ═══════════════════════════════════════════
+       OPTION 5: 모던 민트 (Modern Mint & Navy)
+    ═══════════════════════════════════════════ */
+    .p5 { background: #f0f4f8; font-family: 'Segoe UI', sans-serif; padding-bottom: 1.2rem; }
+    .p5-nav {
+      background: #0f2942; border-bottom: none;
+      padding: 0 1.4rem; height: 56px;
+      display: flex; align-items: center; gap: 1rem;
+    }
+    .p5-logo { font-size: 1rem; font-weight: 800; color: #fff; letter-spacing: -0.01em; }
+    .p5-logo span { color: #2dd4bf; }
+    .p5-nav-links { display: flex; gap: 1.2rem; margin-left: auto; font-size: 0.8rem; color: rgba(255,255,255,0.6); }
+    .p5-btn {
+      background: #2dd4bf; color: #0f2942; border: none;
+      padding: 0.4rem 0.9rem; border-radius: 8px; font-size: 0.75rem; font-weight: 700; cursor: pointer;
+    }
+    .p5-cards { display: flex; gap: 0.8rem; padding: 1rem 1.4rem 0; }
+    .p5-card {
+      background: #fff; border-radius: 12px; overflow: hidden; flex: 1;
+      box-shadow: 0 2px 12px rgba(15,41,66,0.08);
+    }
+    .p5-card-img { height: 90px; background: linear-gradient(135deg,#e0f7f5,#b2f0e9); display:flex;align-items:center;justify-content:center;font-size:1.8rem; }
+    .p5-card-body { padding: 0.7rem; }
+    .p5-card-name { font-size: 0.78rem; font-weight: 600; color: #0f2942; }
+    .p5-card-price { font-size: 0.82rem; font-weight: 700; color: #0d9488; margin-top: 0.2rem; }
+    .p5-card-btn {
+      width: 100%; margin-top: 0.5rem; background: #0f2942;
+      border: none; color: #2dd4bf;
+      padding: 0.3rem; border-radius: 8px; font-size: 0.72rem; cursor: pointer;
+    }
+    .p5-palette { display: flex; gap: 0.4rem; padding: 0.8rem 1.4rem 0; }
+    .p5-palette div { height: 16px; border-radius: 4px; flex: 1; }
+
+    /* ── 팔레트 라벨 ── */
+    .palette-row {
+      display: flex; gap: 0.4rem; padding: 0 1.4rem; margin-top: 0.4rem;
+    }
+    .palette-item { flex: 1; text-align: center; font-size: 0.6rem; color: #8892b0; }
+
+    /* ── 선택 버튼 ── */
+    .select-bar {
+      background: #1a1d27; border-top: 1px solid #2e3350;
+      padding: 0.7rem 1.2rem;
+      display: flex; align-items: center; justify-content: space-between;
+    }
+    .select-bar .keywords { font-size: 0.75rem; color: #8892b0; }
+    .select-btn {
+      background: #2e3350; border: 1px solid #3d4565;
+      color: #e2e8f0; padding: 0.35rem 1rem;
+      border-radius: 6px; font-size: 0.78rem; cursor: pointer;
+      transition: background 0.15s;
+    }
+    .select-btn:hover { background: #3d4565; }
+    .option-wrap.selected .select-btn {
+      background: #6c8aff; border-color: #6c8aff; color: #fff;
+    }
+
+    /* ── 결정 박스 ── */
+    .decision-box {
+      background: #1a1d27; border: 1px solid #2e3350;
+      border-radius: 14px; padding: 1.6rem 2rem; margin-top: 2.5rem;
+      display: flex; align-items: center; justify-content: space-between; gap: 2rem;
+    }
+    .decision-box h3 { font-size: 1rem; font-weight: 700; color: #e2e8f0; margin-bottom: 0.4rem; }
+    .decision-box p { font-size: 0.85rem; color: #8892b0; }
+    .selected-name { font-size: 1.4rem; font-weight: 800; color: #6c8aff; }
+    .custom-note {
+      font-size: 0.8rem; color: #8892b0; margin-top: 0.6rem; line-height: 1.7;
+    }
+  </style>
+</head>
+<body>
+
+<header>
+  <h1>Shopping Mall — 프론트엔드 디자인 옵션</h1>
+  <p>5가지 방향 중 마음에 드는 스타일을 골라주세요. 선택 후 세부 조정 가능합니다.</p>
+</header>
+
+<div class="page-wrap">
+
+  <div class="intro">
+    각 옵션은 <strong>실제 네비게이션 바 + 상품 카드 + 버튼</strong>을 미리 렌더링한 것입니다. 폰트·간격·색상은 선택 후 조정 가능하며,
+    선택하신 테마를 기반으로 <strong>전체 페이지(상품 목록 / 상세 / 로그인 / 장바구니 / 관리자)</strong>를 일관되게 제작합니다.
+  </div>
+
+  <div class="options-grid">
+
+    <!-- ── 옵션 1: 모던 다크 ── -->
+    <div class="option-wrap" id="opt1" onclick="select(1)">
+      <div class="option-label">
+        <div class="option-num">1</div>
+        <div>
+          <div class="option-name">모던 다크</div>
+          <div class="option-sub">Modern Dark · 퍼플 액센트</div>
+        </div>
+        <div class="option-tags">
+          <span class="otag" style="background:rgba(124,58,237,0.15);color:#a78bfa;">세련됨</span>
+          <span class="otag" style="background:rgba(255,255,255,0.06);color:#8892b0;">어두운 배경</span>
+        </div>
+      </div>
+      <div class="preview">
+        <div class="p1">
+          <div class="p1-nav">
+            <div class="p1-logo">SHOP<span>X</span></div>
+            <div class="p1-nav-links">
+              <span>홈</span><span>상품</span><span>카테고리</span>
+            </div>
+            <button class="p1-btn">로그인</button>
+          </div>
+          <div class="p1-cards">
+            <div class="p1-card">
+              <div class="p1-card-img">📱</div>
+              <div class="p1-card-body">
+                <div class="p1-card-name">아이폰 15 Pro</div>
+                <div class="p1-card-price">₩1,550,000</div>
+                <button class="p1-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+            <div class="p1-card">
+              <div class="p1-card-img">💻</div>
+              <div class="p1-card-body">
+                <div class="p1-card-name">맥북 프로 M3</div>
+                <div class="p1-card-price">₩2,990,000</div>
+                <button class="p1-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+            <div class="p1-card">
+              <div class="p1-card-img">🎧</div>
+              <div class="p1-card-body">
+                <div class="p1-card-name">에어팟 프로 2</div>
+                <div class="p1-card-price">₩359,000</div>
+                <button class="p1-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+          </div>
+          <div class="p1-palette">
+            <div style="background:#0d0d0f;"></div>
+            <div style="background:#18181b;"></div>
+            <div style="background:#7c3aed;"></div>
+            <div style="background:#a78bfa;"></div>
+            <div style="background:#ffffff;"></div>
+          </div>
+          <div class="palette-row">
+            <div class="palette-item">배경</div>
+            <div class="palette-item">카드</div>
+            <div class="palette-item">메인</div>
+            <div class="palette-item">액센트</div>
+            <div class="palette-item">텍스트</div>
+          </div>
+        </div>
+      </div>
+      <div class="select-bar">
+        <div class="keywords">어둡고 세련된 느낌 · 기술/전자 쇼핑몰에 잘 어울림</div>
+        <button class="select-btn" id="btn1">선택</button>
+      </div>
+    </div>
+
+    <!-- ── 옵션 2: 클린 화이트 ── -->
+    <div class="option-wrap" id="opt2" onclick="select(2)">
+      <div class="option-label">
+        <div class="option-num">2</div>
+        <div>
+          <div class="option-name">클린 화이트</div>
+          <div class="option-sub">Clean White · 레드 코랄 포인트</div>
+        </div>
+        <div class="option-tags">
+          <span class="otag" style="background:rgba(255,107,107,0.12);color:#ff6b6b;">경쾌함</span>
+          <span class="otag" style="background:rgba(255,255,255,0.06);color:#8892b0;">밝은 배경</span>
+        </div>
+      </div>
+      <div class="preview">
+        <div class="p2">
+          <div class="p2-nav">
+            <div class="p2-logo">SHOP<span>★</span></div>
+            <div class="p2-nav-links">
+              <span style="color:#1a1a2e;font-weight:600;">홈</span>
+              <span>상품</span><span>카테고리</span>
+            </div>
+            <button class="p2-btn">로그인</button>
+          </div>
+          <div class="p2-cards">
+            <div class="p2-card">
+              <div class="p2-card-img">👗</div>
+              <div class="p2-card-body">
+                <div class="p2-card-name">캐주얼 원피스</div>
+                <div class="p2-card-price">₩45,000</div>
+                <button class="p2-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+            <div class="p2-card">
+              <div class="p2-card-img">👟</div>
+              <div class="p2-card-body">
+                <div class="p2-card-name">스니커즈 Air</div>
+                <div class="p2-card-price">₩89,000</div>
+                <button class="p2-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+            <div class="p2-card">
+              <div class="p2-card-img">👜</div>
+              <div class="p2-card-body">
+                <div class="p2-card-name">크로스백</div>
+                <div class="p2-card-price">₩62,000</div>
+                <button class="p2-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+          </div>
+          <div class="p2-palette">
+            <div style="background:#f8f9fa;border:1px solid #dee2e6;"></div>
+            <div style="background:#ffffff;border:1px solid #dee2e6;"></div>
+            <div style="background:#ff6b6b;"></div>
+            <div style="background:#ffa8a8;"></div>
+            <div style="background:#1a1a2e;"></div>
+          </div>
+          <div class="palette-row">
+            <div class="palette-item">배경</div>
+            <div class="palette-item">카드</div>
+            <div class="palette-item">메인</div>
+            <div class="palette-item">액센트</div>
+            <div class="palette-item">텍스트</div>
+          </div>
+        </div>
+      </div>
+      <div class="select-bar">
+        <div class="keywords">깔끔하고 친근한 느낌 · 패션/생활용품에 잘 어울림</div>
+        <button class="select-btn" id="btn2">선택</button>
+      </div>
+    </div>
+
+    <!-- ── 옵션 3: 럭셔리 블랙 ── -->
+    <div class="option-wrap" id="opt3" onclick="select(3)">
+      <div class="option-label">
+        <div class="option-num">3</div>
+        <div>
+          <div class="option-name">럭셔리 블랙</div>
+          <div class="option-sub">Luxury Black · 골드 포인트</div>
+        </div>
+        <div class="option-tags">
+          <span class="otag" style="background:rgba(201,168,76,0.15);color:#c9a84c;">고급스러움</span>
+          <span class="otag" style="background:rgba(255,255,255,0.06);color:#8892b0;">프리미엄</span>
+        </div>
+      </div>
+      <div class="preview">
+        <div class="p3">
+          <div class="p3-nav">
+            <div class="p3-logo"><span>■ </span>LUXE</div>
+            <div class="p3-nav-links">
+              <span>NEW IN</span><span>WOMEN</span><span>MEN</span>
+            </div>
+            <button class="p3-btn">LOGIN</button>
+          </div>
+          <div class="p3-cards">
+            <div class="p3-card">
+              <div class="p3-card-img">💎</div>
+              <div class="p3-card-body">
+                <div class="p3-card-name">Diamond Ring</div>
+                <div class="p3-card-price">₩ 2,800,000</div>
+                <button class="p3-card-btn">ADD TO BAG</button>
+              </div>
+            </div>
+            <div class="p3-card">
+              <div class="p3-card-img">⌚</div>
+              <div class="p3-card-body">
+                <div class="p3-card-name">Premium Watch</div>
+                <div class="p3-card-price">₩ 1,200,000</div>
+                <button class="p3-card-btn">ADD TO BAG</button>
+              </div>
+            </div>
+            <div class="p3-card">
+              <div class="p3-card-img">👒</div>
+              <div class="p3-card-body">
+                <div class="p3-card-name">Silk Hat</div>
+                <div class="p3-card-price">₩ 450,000</div>
+                <button class="p3-card-btn">ADD TO BAG</button>
+              </div>
+            </div>
+          </div>
+          <div class="p3-palette">
+            <div style="background:#080808;"></div>
+            <div style="background:#111111;"></div>
+            <div style="background:#c9a84c;"></div>
+            <div style="background:#e8d5a3;"></div>
+            <div style="background:#ffffff;"></div>
+          </div>
+          <div class="palette-row">
+            <div class="palette-item" style="color:#444;">배경</div>
+            <div class="palette-item" style="color:#444;">카드</div>
+            <div class="palette-item" style="color:#444;">골드</div>
+            <div class="palette-item" style="color:#444;">밝은 골드</div>
+            <div class="palette-item" style="color:#444;">텍스트</div>
+          </div>
+        </div>
+      </div>
+      <div class="select-bar">
+        <div class="keywords">프리미엄 고급 느낌 · 명품/주얼리/하이엔드 쇼핑몰에 적합</div>
+        <button class="select-btn" id="btn3">선택</button>
+      </div>
+    </div>
+
+    <!-- ── 옵션 4: 비비드 그라디언트 ── -->
+    <div class="option-wrap" id="opt4" onclick="select(4)">
+      <div class="option-label">
+        <div class="option-num">4</div>
+        <div>
+          <div class="option-name">비비드 그라디언트</div>
+          <div class="option-sub">Vivid Gradient · 퍼플-블루 그라디언트</div>
+        </div>
+        <div class="option-tags">
+          <span class="otag" style="background:rgba(102,126,234,0.15);color:#667eea;">트렌디</span>
+          <span class="otag" style="background:rgba(255,255,255,0.06);color:#8892b0;">그라디언트</span>
+        </div>
+      </div>
+      <div class="preview">
+        <div class="p4">
+          <div class="p4-nav">
+            <div class="p4-logo">✦ VIBE SHOP</div>
+            <div class="p4-nav-links">
+              <span>홈</span><span>탐색</span><span>핫딜</span>
+            </div>
+            <button class="p4-btn">로그인</button>
+          </div>
+          <div class="p4-cards">
+            <div class="p4-card">
+              <div class="p4-card-img" style="background:linear-gradient(135deg,#e0e7ff,#ddd6fe);">🎮</div>
+              <div class="p4-card-body">
+                <div class="p4-card-name">플레이스테이션 5</div>
+                <div class="p4-card-price">₩698,000</div>
+                <button class="p4-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+            <div class="p4-card">
+              <div class="p4-card-img" style="background:linear-gradient(135deg,#fce7f3,#fbcfe8);">🎵</div>
+              <div class="p4-card-body">
+                <div class="p4-card-name">블루투스 스피커</div>
+                <div class="p4-card-price">₩159,000</div>
+                <button class="p4-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+            <div class="p4-card">
+              <div class="p4-card-img" style="background:linear-gradient(135deg,#d1fae5,#a7f3d0);">📷</div>
+              <div class="p4-card-body">
+                <div class="p4-card-name">미러리스 카메라</div>
+                <div class="p4-card-price">₩1,290,000</div>
+                <button class="p4-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+          </div>
+          <div class="p4-palette">
+            <div style="background:#f8f9fa;border:1px solid #dee2e6;"></div>
+            <div style="background:#fff;border:1px solid #dee2e6;"></div>
+            <div style="background:linear-gradient(90deg,#667eea,#764ba2);"></div>
+            <div style="background:#a5b4fc;"></div>
+            <div style="background:#2d3748;"></div>
+          </div>
+          <div class="palette-row">
+            <div class="palette-item">배경</div>
+            <div class="palette-item">카드</div>
+            <div class="palette-item">그라디언트</div>
+            <div class="palette-item">액센트</div>
+            <div class="palette-item">텍스트</div>
+          </div>
+        </div>
+      </div>
+      <div class="select-bar">
+        <div class="keywords">트렌디하고 에너지 넘치는 느낌 · MZ 타겟 종합 쇼핑몰</div>
+        <button class="select-btn" id="btn4">선택</button>
+      </div>
+    </div>
+
+    <!-- ── 옵션 5: 모던 민트 ── -->
+    <div class="option-wrap" id="opt5" onclick="select(5)">
+      <div class="option-label">
+        <div class="option-num">5</div>
+        <div>
+          <div class="option-name">모던 민트</div>
+          <div class="option-sub">Modern Mint · 네이비 + 민트 조합</div>
+        </div>
+        <div class="option-tags">
+          <span class="otag" style="background:rgba(45,212,191,0.12);color:#2dd4bf;">신뢰감</span>
+          <span class="otag" style="background:rgba(255,255,255,0.06);color:#8892b0;">안정적</span>
+        </div>
+      </div>
+      <div class="preview">
+        <div class="p5">
+          <div class="p5-nav">
+            <div class="p5-logo">SHOP<span>+</span></div>
+            <div class="p5-nav-links">
+              <span>홈</span><span>상품</span><span>카테고리</span>
+            </div>
+            <button class="p5-btn">로그인</button>
+          </div>
+          <div class="p5-cards">
+            <div class="p5-card">
+              <div class="p5-card-img">🏃</div>
+              <div class="p5-card-body">
+                <div class="p5-card-name">러닝화 Pro</div>
+                <div class="p5-card-price">₩129,000</div>
+                <button class="p5-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+            <div class="p5-card">
+              <div class="p5-card-img">🧴</div>
+              <div class="p5-card-body">
+                <div class="p5-card-name">스킨케어 세트</div>
+                <div class="p5-card-price">₩78,000</div>
+                <button class="p5-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+            <div class="p5-card">
+              <div class="p5-card-img">📚</div>
+              <div class="p5-card-body">
+                <div class="p5-card-name">베스트셀러 도서</div>
+                <div class="p5-card-price">₩18,000</div>
+                <button class="p5-card-btn">장바구니 담기</button>
+              </div>
+            </div>
+          </div>
+          <div class="p5-palette">
+            <div style="background:#f0f4f8;border:1px solid #cbd5e0;"></div>
+            <div style="background:#fff;border:1px solid #cbd5e0;"></div>
+            <div style="background:#0f2942;"></div>
+            <div style="background:#2dd4bf;"></div>
+            <div style="background:#0d9488;"></div>
+          </div>
+          <div class="palette-row">
+            <div class="palette-item">배경</div>
+            <div class="palette-item">카드</div>
+            <div class="palette-item">네이비</div>
+            <div class="palette-item">민트</div>
+            <div class="palette-item">딥민트</div>
+          </div>
+        </div>
+      </div>
+      <div class="select-bar">
+        <div class="keywords">신뢰감 있고 안정적인 느낌 · 생활용품/헬스/뷰티 쇼핑몰</div>
+        <button class="select-btn" id="btn5">선택</button>
+      </div>
+    </div>
+
+  </div>
+
+  <!-- ── 결정 박스 ── -->
+  <div class="decision-box">
+    <div>
+      <h3>선택한 디자인</h3>
+      <div class="selected-name" id="selected-display">—</div>
+      <p id="selected-sub" style="margin-top:0.3rem; color:#8892b0; font-size:0.85rem;">위 카드를 클릭해 원하는 스타일을 선택해주세요.</p>
+    </div>
+    <div>
+      <div class="custom-note">
+        ✦ 선택 후 <strong style="color:#e2e8f0;">색상·폰트·레이아웃</strong>을 추가로 조정할 수 있습니다.<br/>
+        ✦ 원하는 스타일이 없으면 <strong style="color:#e2e8f0;">두 옵션을 합쳐달라</strong>고 말씀해 주세요.<br/>
+        ✦ 선택이 어렵다면 <strong style="color:#6c8aff;">옵션 1 (모던 다크)</strong>을 기본으로 시작합니다.
+      </div>
+    </div>
+  </div>
+
+</div>
+
+<script>
+  const names = {
+    1: '옵션 1 — 모던 다크', 2: '옵션 2 — 클린 화이트',
+    3: '옵션 3 — 럭셔리 블랙', 4: '옵션 4 — 비비드 그라디언트',
+    5: '옵션 5 — 모던 민트',
+  };
+  const subs = {
+    1: 'Dark background + Purple accent · 세련된 테크 쇼핑몰',
+    2: 'White background + Red coral · 친근한 패션 쇼핑몰',
+    3: 'Black background + Gold accent · 프리미엄 럭셔리',
+    4: 'White background + Gradient · 트렌디한 종합 쇼핑몰',
+    5: 'Light background + Navy/Mint · 신뢰감 있는 생활 쇼핑몰',
+  };
+  let current = 0;
+  function select(n) {
+    if (current) {
+      document.getElementById('opt' + current).classList.remove('selected');
+      document.getElementById('btn' + current).textContent = '선택';
+    }
+    current = n;
+    document.getElementById('opt' + n).classList.add('selected');
+    document.getElementById('btn' + n).textContent = '✓ 선택됨';
+    document.getElementById('selected-display').textContent = names[n];
+    document.getElementById('selected-sub').textContent = subs[n];
+  }
+</script>
+
+</body>
+</html>
