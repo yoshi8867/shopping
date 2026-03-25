@@ -191,7 +191,7 @@
     <h1>Shopping Mall — 진행 상황</h1>
     <p>NestJS + React 쇼핑몰 연습 프로젝트</p>
   </div>
-  <div class="last-updated">마지막 업데이트: 2026-03-25</div>
+  <div class="last-updated">마지막 업데이트: 2026-03-25 · 백엔드 전체 완료</div>
 </header>
 
 <main>
@@ -200,25 +200,25 @@
   <div class="overall-card">
     <div>
       <div class="overall-title">전체 진행률</div>
-      <div class="overall-pct">22%</div>
-      <div class="overall-sub">9단계 중 2단계 완료 · 백엔드 진행 중</div>
+      <div class="overall-pct">89%</div>
+      <div class="overall-sub">9단계 중 8단계 완료 · 프론트엔드 대기 중</div>
       <div class="progress-bar-wrap">
         <div class="progress-bar-bg">
-          <div class="progress-bar-fill" style="width:22%;"></div>
+          <div class="progress-bar-fill" style="width:89%;"></div>
         </div>
       </div>
     </div>
     <div class="stat-grid">
       <div class="stat-item">
-        <div class="stat-num" style="color:var(--green);">2</div>
+        <div class="stat-num" style="color:var(--green);">8</div>
         <div class="stat-label">완료</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num" style="color:var(--yellow);">1</div>
+        <div class="stat-num" style="color:var(--yellow);">0</div>
         <div class="stat-label">진행 중</div>
       </div>
       <div class="stat-item">
-        <div class="stat-num" style="color:var(--muted);">6</div>
+        <div class="stat-num" style="color:var(--muted);">1</div>
         <div class="stat-label">대기</div>
       </div>
     </div>
@@ -273,122 +273,124 @@
     </div>
 
     <!-- 3. UserModule -->
-    <div class="phase-card todo">
+    <div class="phase-card done">
       <div class="phase-header">
         <div class="phase-num">3</div>
         <div class="phase-name">UserModule</div>
-        <div class="phase-badge">대기</div>
+        <div class="phase-badge">완료</div>
       </div>
       <div class="phase-body">
-        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:100%;"></div></div>
         <div class="checklist">
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/users/me — 내 프로필 상세</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">PATCH /api/users/me — 내 정보 수정</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/admin/users — 전체 회원 목록 (관리자)</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">GET /api/users/me — 내 프로필 상세</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">PATCH /api/users/me — 내 정보 수정 (비밀번호 변경 포함)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">GET /api/users — 전체 회원 목록 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">유닛 테스트 8개 — 전체 통과</span></div>
+          <div class="check-sub">findMe: 정상조회 / 없는 유저</div>
+          <div class="check-sub">updateMe: 정상수정 / 비밀번호 해시 / 없는 유저 / password 미반환</div>
+          <div class="check-sub">findAll: 목록반환 / 빈 배열</div>
         </div>
       </div>
     </div>
 
     <!-- 4. CategoryModule -->
-    <div class="phase-card todo">
+    <div class="phase-card done">
       <div class="phase-header">
         <div class="phase-num">4</div>
         <div class="phase-name">CategoryModule</div>
-        <div class="phase-badge">대기</div>
+        <div class="phase-badge">완료</div>
       </div>
       <div class="phase-body">
-        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:100%;"></div></div>
         <div class="checklist">
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Category 엔티티</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/categories — 목록 (공개)</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/categories — 생성 (관리자)</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">PATCH /api/categories/:id — 수정 (관리자)</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">DELETE /api/categories/:id — 삭제 (관리자)</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">Category 엔티티</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">GET /api/categories — 목록 (공개)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">POST /api/categories — 생성 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">PATCH /api/categories/:id — 수정 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">DELETE /api/categories/:id — 삭제 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">유닛 테스트 6개 — 전체 통과</span></div>
         </div>
       </div>
     </div>
 
     <!-- 5. ProductModule -->
-    <div class="phase-card todo">
+    <div class="phase-card done">
       <div class="phase-header">
         <div class="phase-num">5</div>
         <div class="phase-name">ProductModule</div>
-        <div class="phase-badge">대기</div>
+        <div class="phase-badge">완료</div>
       </div>
       <div class="phase-body">
-        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:100%;"></div></div>
         <div class="checklist">
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Product 엔티티</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/products — 목록 (필터·정렬)</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/products/:id — 상세</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/products — 등록 (관리자)</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">PATCH /api/products/:id — 수정 (관리자)</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">DELETE /api/products/:id — 삭제 (관리자)</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">Product 엔티티</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">GET /api/products — 목록 (카테고리·검색·정렬·페이지네이션)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">GET /api/products/:id — 상세</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">POST /api/products — 등록 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">PATCH /api/products/:id — 수정 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">DELETE /api/products/:id — 삭제 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">유닛 테스트 7개 — 전체 통과</span></div>
         </div>
       </div>
     </div>
 
     <!-- 6. CartModule -->
-    <div class="phase-card todo">
+    <div class="phase-card done">
       <div class="phase-header">
         <div class="phase-num">6</div>
         <div class="phase-name">CartModule</div>
-        <div class="phase-badge">대기</div>
+        <div class="phase-badge">완료</div>
       </div>
       <div class="phase-body">
-        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:100%;"></div></div>
         <div class="checklist">
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Cart / CartItem 엔티티</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/cart — 내 장바구니</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/cart/items — 상품 추가</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">PATCH /api/cart/items/:id — 수량 수정</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">DELETE /api/cart/items/:id — 항목 삭제</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">Cart / CartItem 엔티티</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">GET /api/cart — 내 장바구니 (없으면 자동 생성)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">POST /api/cart/items — 상품 추가 (재고 확인, 중복 시 수량 합산)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">PATCH /api/cart/items/:id — 수량 수정</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">DELETE /api/cart/items/:id — 항목 삭제</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">유닛 테스트 4개 — 전체 통과</span></div>
         </div>
       </div>
     </div>
 
     <!-- 7. OrderModule -->
-    <div class="phase-card todo">
+    <div class="phase-card done">
       <div class="phase-header">
         <div class="phase-num">7</div>
         <div class="phase-name">OrderModule</div>
-        <div class="phase-badge">대기</div>
+        <div class="phase-badge">완료</div>
       </div>
       <div class="phase-body">
-        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:100%;"></div></div>
         <div class="checklist">
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Order / OrderItem 엔티티</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/orders — 주문 생성</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/orders — 내 주문 목록</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/orders/:id — 주문 상세</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">DELETE /api/orders/:id — 주문 취소</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/admin/orders — 전체 주문 (관리자)</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">PATCH /api/admin/orders/:id/status — 상태 변경</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">Order / OrderItem 엔티티 (가격 스냅샷)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">POST /api/orders — 주문 생성 (재고 확인 · 차감 · 장바구니 비우기)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">GET /api/orders — 내 주문 목록</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">GET /api/orders/:id — 주문 상세</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">DELETE /api/orders/:id — 주문 취소 (재고 복구)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">GET /api/orders/admin/all — 전체 주문 (관리자)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">PATCH /api/orders/admin/:id/status — 상태 변경</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">유닛 테스트 6개 — 전체 통과</span></div>
         </div>
       </div>
     </div>
 
     <!-- 8. PaymentModule -->
-    <div class="phase-card todo">
+    <div class="phase-card done">
       <div class="phase-header">
         <div class="phase-num">8</div>
         <div class="phase-name">PaymentModule (Mock)</div>
-        <div class="phase-badge">대기</div>
+        <div class="phase-badge">완료</div>
       </div>
       <div class="phase-body">
-        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:0%;"></div></div>
+        <div class="phase-mini-bar"><div class="phase-mini-bar-fill" style="width:100%;"></div></div>
         <div class="checklist">
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">Payment 엔티티</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/payments — 결제 요청</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/payments/callback — Mock PG 콜백</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">GET /api/payments/:orderId — 결제 상태</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">POST /api/payments/:id/refund — 환불</span></div>
-          <div class="check-item"><span class="check-icon">⬜</span><span class="check-text todo-text">유닛 테스트</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">Payment 엔티티</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">POST /api/payments — 결제 요청 (Mock: 즉시 SUCCESS)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">GET /api/payments/order/:orderId — 결제 상태 조회</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">POST /api/payments/:id/refund — 환불 (주문 CANCELLED 처리)</span></div>
+          <div class="check-item"><span class="check-icon">✅</span><span class="check-text done-text">유닛 테스트 5개 — 전체 통과</span></div>
         </div>
       </div>
     </div>
@@ -418,6 +420,33 @@
   <!-- ── 작업 이력 타임라인 ── -->
   <div class="section-title">작업 이력</div>
   <div class="timeline">
+
+    <div class="tl-item">
+      <div class="tl-dot done"></div>
+      <div class="tl-date">2026-03-25</div>
+      <div class="tl-title" style="color:var(--green);">백엔드 전체 완료 (Category · Product · Cart · Order · Payment)</div>
+      <div class="tl-desc">나머지 5개 모듈 한 번에 완성. 전체 API 19개 엔드포인트, Jest 49개 테스트 통과.</div>
+      <div class="tl-tags">
+        <span class="tl-tag green">19 API</span>
+        <span class="tl-tag green">Jest 49/49</span>
+        <span class="tl-tag green">재고 관리</span>
+        <span class="tl-tag green">가격 스냅샷</span>
+        <span class="tl-tag green">Mock 결제</span>
+      </div>
+    </div>
+
+    <div class="tl-item">
+      <div class="tl-dot done"></div>
+      <div class="tl-date">2026-03-25</div>
+      <div class="tl-title" style="color:var(--green);">UserModule 완료</div>
+      <div class="tl-desc">내 프로필 조회/수정, 관리자 회원 목록 구현. 유닛 테스트 8개 전체 통과.</div>
+      <div class="tl-tags">
+        <span class="tl-tag green">GET /users/me</span>
+        <span class="tl-tag green">PATCH /users/me</span>
+        <span class="tl-tag green">GET /users (admin)</span>
+        <span class="tl-tag green">Jest 8/8</span>
+      </div>
+    </div>
 
     <div class="tl-item">
       <div class="tl-dot done"></div>
